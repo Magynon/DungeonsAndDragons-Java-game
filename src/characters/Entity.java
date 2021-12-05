@@ -4,11 +4,10 @@ import spells.Earth;
 import spells.Fire;
 import spells.Ice;
 import spells.Spell;
-
 import java.util.List;
 
 public abstract class Entity {
-    private int maxLife, maxMana;
+    protected int maxLife = 100, maxMana = 100;
     protected int currentLife, currentMana;
     protected boolean ice = false, fire = false, earth = false;
     protected List<Spell> spellList;

@@ -9,7 +9,7 @@ abstract public class Character extends Entity{
     private int Ox, Oy;
     protected int xp;
     protected int level = 1;
-    protected double strenght, charisma, dexterity;
+    protected double strength, charisma, dexterity;
     protected Inventory inventory;
 
     public Inventory getInventory() {

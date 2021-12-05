@@ -1,12 +1,11 @@
 package characters;
 
 import shop.Inventory;
-import shop.Potion;
 
 public class Rogue extends Character{
     public Rogue(){
         inventory = new Inventory(50);
-        strenght = ((double)level / 3) * 100;
+        strength = ((double)level / 3) * 100;
         charisma = ((double)level / 6) * 100;
         dexterity = ((double)level / 2) * 100;
         earth = true;
@@ -14,11 +13,18 @@ public class Rogue extends Character{
 
     @Override
     void receiveDamage(int damage) {
-
+        if(strength > charisma + 40){
+            damage /= 2;
+        }
+        currentLife -= damage;
     }
 
     @Override
     int getDamage() {
-        return 0;
+        int damage = (int)(3/4 * dexterity + 1/8 * strength + 1/8 * charisma);
+        if(dexterity > strength + 50*level){
+            damage *= 2;
+        }
+        return damage;
     }
 }
