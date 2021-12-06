@@ -43,6 +43,14 @@ public class Cell {
         return Oy;
     }
 
+    public CellElement getObj() {
+        return obj;
+    }
+
+    public void setObj(CellElement obj) {
+        this.obj = obj;
+    }
+
     @Override
     public String toString() {
         return Ox +

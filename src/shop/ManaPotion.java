@@ -28,4 +28,13 @@ public class ManaPotion implements Potion{
     public int getWeight() {
         return weight;
     }
+
+    @Override
+    public String toString() {
+        return "ManaPotion{" +
+                "weight=" + weight +
+                ", price=" + price +
+                ", regen=" + regen +
+                '}';
+    }
 }

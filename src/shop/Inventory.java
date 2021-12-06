@@ -11,7 +11,7 @@ public class Inventory {
     private int coinNumber;
 
     public Inventory(int maxWeight){
-        potionList = new ArrayList<Potion>();
+        potionList = new ArrayList<>();
         this.maxWeight = maxWeight;
         currentWeight = 0;
         coinNumber = 0;
@@ -36,5 +36,15 @@ public class Inventory {
     public Potion removePotion(int index){
         currentWeight -= potionList.get(index).getWeight();
         return potionList.remove(index);
+    }
+
+    @Override
+    public String toString() {
+        return "Inventory{" +
+                "potionList=" + potionList +
+                ", maxWeight=" + maxWeight +
+                ", currentWeight=" + currentWeight +
+                ", coinNumber=" + coinNumber +
+                '}';
     }
 }

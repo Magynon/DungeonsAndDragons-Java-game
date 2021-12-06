@@ -28,4 +28,13 @@ public class HealthPotion implements Potion{
     public int getWeight() {
         return weight;
     }
+
+    @Override
+    public String toString() {
+        return "HealthPotion{" +
+                "weight=" + weight +
+                ", price=" + price +
+                ", regen=" + regen +
+                '}';
+    }
 }

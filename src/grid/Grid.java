@@ -1,19 +1,23 @@
 package grid;
 
+import characters.Enemy;
+import characters.Rogue;
 import exceptions.GridSizeOverflowException;
+import shop.Shop;
 
 import java.util.ArrayList;
 import java.util.Random;
 
 public class Grid extends ArrayList<ArrayList<Cell>> {
     private int height, width;
-    private Cell currentCell = new Cell(0,0);
+    private Cell currentCell;
     private characters.Character character;
 
     public Grid(){
     }
 
-    public Grid genMap(int width, int height){
+    public Grid genMap(int width, int height, characters.Character character){
+        this.character = character;
         this.width = width;
         this.height = height;
         Random rand = new Random();
@@ -25,14 +29,19 @@ public class Grid extends ArrayList<ArrayList<Cell>> {
 
         // initialise cells
         for(int i = 0; i < height; i++){
-            add(new ArrayList<Cell>(width));
+            add(new ArrayList<>(width));
             for(int j = 0; j < width; j++){
                 get(i).add(new Cell(j, i));
                 get(i).get(j).setType(Cell.CellType.EMPTY);
+                get(i).get(j).setObj(new Empty());
             }
         }
+        currentCell = get(0).get(0);
+        currentCell.visit();
+        coinsAvailableIfEmpty(currentCell);
 
         get(height-1).get(width-1).setType(Cell.CellType.FINISH);
+        get(height-1).get(width-1).setObj(new Finish());
 
         // generate at least 4 enemies
         for(int i = 0; i < enemies; i++){
@@ -44,6 +53,7 @@ public class Grid extends ArrayList<ArrayList<Cell>> {
                 y = rand.nextInt(height);
             }
             get(y).get(x).setType(Cell.CellType.ENEMY);
+            get(y).get(x).setObj(new Enemy());
         }
 
         // generate at least 2 shops
@@ -56,6 +66,7 @@ public class Grid extends ArrayList<ArrayList<Cell>> {
                 y = rand.nextInt(height);
             }
             get(y).get(x).setType(Cell.CellType.SHOP);
+            get(y).get(x).setObj(new Shop());
         }
         return this;
     }
@@ -78,7 +89,9 @@ public class Grid extends ArrayList<ArrayList<Cell>> {
     public void goNorth() throws GridSizeOverflowException {
         if(currentCell.getOy() - 1 >= 0) {
             currentCell = get(currentCell.getOy() - 1).get(currentCell.getOx());
+            currentCell.visit();
             coinsAvailableIfEmpty(currentCell);
+            character.setCurrentCoordinates(currentCell);
         }
         else
             throw new GridSizeOverflowException("Can't go north!");
@@ -88,7 +101,9 @@ public class Grid extends ArrayList<ArrayList<Cell>> {
         int random;
         if(currentCell.getOy() + 1 < height) {
             currentCell = get(currentCell.getOy() + 1).get(currentCell.getOx());
+            currentCell.visit();
             coinsAvailableIfEmpty(currentCell);
+            character.setCurrentCoordinates(currentCell);
         }
         else
             throw new GridSizeOverflowException("Can't go south!");
@@ -97,7 +112,9 @@ public class Grid extends ArrayList<ArrayList<Cell>> {
     public void goEast() throws GridSizeOverflowException {
         if(currentCell.getOx() + 1 < width) {
             currentCell = get(currentCell.getOy()).get(currentCell.getOx() + 1);
+            currentCell.visit();
             coinsAvailableIfEmpty(currentCell);
+            character.setCurrentCoordinates(currentCell);
         }
         else
             throw new GridSizeOverflowException("Can't go east!");
@@ -106,9 +123,38 @@ public class Grid extends ArrayList<ArrayList<Cell>> {
     public void goWest() throws GridSizeOverflowException {
         if(currentCell.getOx() - 1 >= 0) {
             currentCell = get(currentCell.getOy()).get(currentCell.getOx() - 1);
+            currentCell.visit();
             coinsAvailableIfEmpty(currentCell);
+            character.setCurrentCoordinates(currentCell);
         }
         else
             throw new GridSizeOverflowException("Can't go west!");
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder out = new StringBuilder();
+        for(int i = 0; i < height; i++){
+            for(int j = 0; j < width; j++){
+                if(get(i).get(j).isVisited()){
+                    out.append(get(i).get(j).getObj().toCharacter()).append(" ");
+                }
+                else{
+                    out.append("? ");
+                }
+            }
+            out.append("\n");
+        }
+        return out.toString();
+    }
+    public String showAllGrid(){
+        StringBuilder out = new StringBuilder();
+        for(int i = 0; i < height; i++){
+            for(int j = 0; j < width; j++){
+                out.append(get(i).get(j).getObj().toCharacter()).append(" ");
+            }
+            out.append("\n");
+        }
+        return out.toString();
     }
 }

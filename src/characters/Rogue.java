@@ -27,4 +27,9 @@ public class Rogue extends Character{
         }
         return damage;
     }
+
+    @Override
+    public String toString() {
+        return super.toString();
+    }
 }

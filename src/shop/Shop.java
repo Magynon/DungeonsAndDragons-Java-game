@@ -12,7 +12,7 @@ public class Shop implements CellElement {
     public Shop(){
         Random rand = new Random();
         int capacity = rand.nextInt(3) + 2;
-        potionList = new ArrayList<Potion>(capacity);
+        potionList = new ArrayList<>(capacity);
 
         for(int i = 0; i < capacity; i++){
             if(rand.nextBoolean())
@@ -29,5 +29,12 @@ public class Shop implements CellElement {
     @Override
     public char toCharacter() {
         return 'S';
+    }
+
+    @Override
+    public String toString() {
+        return "Shop{" +
+                "potionList=" + potionList +
+                "}\n";
     }
 }
