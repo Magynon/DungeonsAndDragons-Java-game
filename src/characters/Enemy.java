@@ -4,6 +4,7 @@ import grid.CellElement;
 import spells.Earth;
 import spells.Fire;
 import spells.Ice;
+import visitor.Visitor;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -68,5 +69,10 @@ public class Enemy extends Entity implements CellElement {
         return "Enemy{" +
                 "damage=" + damage +
                 "}\n";
+    }
+
+    @Override
+    public void accept(Visitor visitor) {
+        visitor.visit(this);
     }
 }

@@ -1,6 +1,7 @@
 package characters;
 
 import shop.Inventory;
+import visitor.Visitor;
 
 public class Warrior extends Character{
     public Warrior(){
@@ -31,5 +32,10 @@ public class Warrior extends Character{
     @Override
     public String toString() {
         return super.toString();
+    }
+
+    @Override
+    public void accept(Visitor visitor) {
+
     }
 }

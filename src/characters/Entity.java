@@ -4,9 +4,11 @@ import spells.Earth;
 import spells.Fire;
 import spells.Ice;
 import spells.Spell;
+import visitor.Element;
+
 import java.util.List;
 
-public abstract class Entity {
+public abstract class Entity implements Element {
     protected int maxLife = 100, maxMana = 100;
     protected int currentLife, currentMana;
     protected boolean ice = false, fire = false, earth = false;

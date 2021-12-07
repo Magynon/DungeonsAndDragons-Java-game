@@ -38,7 +38,6 @@ public class Grid extends ArrayList<ArrayList<Cell>> {
         }
         currentCell = get(0).get(0);
         currentCell.visit();
-        coinsAvailableIfEmpty(currentCell);
 
         get(height-1).get(width-1).setType(Cell.CellType.FINISH);
         get(height-1).get(width-1).setObj(new Finish());
@@ -48,7 +47,8 @@ public class Grid extends ArrayList<ArrayList<Cell>> {
             int x = rand.nextInt(width);
             int y = rand.nextInt(height);
 
-            while(get(y).get(x).getType() != Cell.CellType.EMPTY || (x == width-1 && y == height-1)){
+            while(get(y).get(x).getType() != Cell.CellType.EMPTY ||
+                    (x == width-1 && y == height-1) || (x == 0 && y == 0)){
                 x = rand.nextInt(width);
                 y = rand.nextInt(height);
             }
@@ -61,7 +61,8 @@ public class Grid extends ArrayList<ArrayList<Cell>> {
             int x = rand.nextInt(width);
             int y = rand.nextInt(height);
 
-            while(get(y).get(x).getType() != Cell.CellType.EMPTY || (x == width-1 && y == height-1)){
+            while(get(y).get(x).getType() != Cell.CellType.EMPTY ||
+                    (x == width-1 && y == height-1) || (x == 0 && y == 0)){
                 x = rand.nextInt(width);
                 y = rand.nextInt(height);
             }
