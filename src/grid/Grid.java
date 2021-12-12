@@ -1,5 +1,6 @@
 package grid;
 
+import characters.Character;
 import characters.Enemy;
 import characters.Rogue;
 import exceptions.GridSizeOverflowException;
@@ -74,6 +75,10 @@ public class Grid extends ArrayList<ArrayList<Cell>> {
 
     public Cell getCurrentCell() {
         return currentCell;
+    }
+
+    public Character getCharacter() {
+        return character;
     }
 
     // check if coins are available in cell, in case it is empty

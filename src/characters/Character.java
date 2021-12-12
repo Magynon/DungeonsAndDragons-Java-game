@@ -6,7 +6,7 @@ import shop.Inventory;
 import shop.Potion;
 
 abstract public class Character extends Entity{
-    private String name;
+    protected String name;
     private int Ox, Oy;
     protected int xp;
     protected int level = 1;
@@ -15,6 +15,10 @@ abstract public class Character extends Entity{
 
     public Inventory getInventory() {
         return inventory;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public void buyPotion(Potion potion) throws InventoryFullOrNotEnoughMoneyException {

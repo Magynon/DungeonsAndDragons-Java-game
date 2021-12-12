@@ -10,6 +10,7 @@ public class Warrior extends Character{
         charisma = ((double)level / 6) * 100;
         dexterity = ((double)level / 3) * 100;
         fire = true;
+        name = "Warrior";
     }
 
     @Override

@@ -12,6 +12,7 @@ public class Mage extends Character{
         ice = true;
         currentLife = maxLife;
         currentMana = maxMana;
+        name = "Mage";
     }
 
     void receiveDamage(int damage) {

@@ -10,6 +10,7 @@ public class Rogue extends Character{
         charisma = ((double)level / 6) * 100;
         dexterity = ((double)level / 2) * 100;
         earth = true;
+        name = "Rogue";
     }
 
     @Override
