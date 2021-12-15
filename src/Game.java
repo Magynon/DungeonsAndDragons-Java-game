@@ -2,7 +2,6 @@ import exceptions.GridSizeOverflowException;
 import exceptions.InformationIncompleteException;
 import exceptions.InvalidCommandException;
 import grid.Cell;
-import grid.CellElement;
 import grid.Grid;
 import json.JSONParser;
 import setup.Account;
@@ -13,8 +12,15 @@ import java.util.Map;
 import java.util.Scanner;
 
 public class Game {
+    private static Game game = new Game();
     List<Account> accountList;
     Map<Cell.CellType, List<String>> stories;
+
+    private Game(){ }
+
+    public static Game getInstance(){
+        return game;
+    }
 
     public void run() throws IOException, InformationIncompleteException, InvalidCommandException, GridSizeOverflowException {
         Scanner keyboard = new Scanner(System.in);
@@ -78,7 +84,7 @@ public class Game {
             }
 
             // start game with account
-            Grid grid = new Grid();
+            Grid grid = Grid.getInstance();
             grid = grid.genMap(10,4, account.getCharacters().get(input-1));
             System.out.println(grid.showAllGrid());
             System.out.println(grid + grid.getCurrentCell().getObj().toString() + grid.getCharacter());

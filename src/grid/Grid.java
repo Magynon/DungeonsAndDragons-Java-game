@@ -10,11 +10,16 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class Grid extends ArrayList<ArrayList<Cell>> {
+    private static Grid grid = new Grid();
     private int height, width;
     private Cell currentCell;
     private characters.Character character;
 
-    public Grid(){
+    private Grid(){
+    }
+
+    public static Grid getInstance(){
+        return grid;
     }
 
     public Grid genMap(int width, int height, characters.Character character){
