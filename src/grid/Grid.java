@@ -2,7 +2,6 @@ package grid;
 
 import characters.Character;
 import characters.Enemy;
-import characters.Rogue;
 import exceptions.GridSizeOverflowException;
 import shop.Shop;
 
@@ -101,6 +100,7 @@ public class Grid extends ArrayList<ArrayList<Cell>> {
         if(currentCell.getOy() - 1 >= 0) {
             currentCell = get(currentCell.getOy() - 1).get(currentCell.getOx());
             currentCell.visit();
+            currentCell.incrementTimesVisited();
             coinsAvailableIfEmpty(currentCell);
             character.setCurrentCoordinates(currentCell);
         }
@@ -113,6 +113,7 @@ public class Grid extends ArrayList<ArrayList<Cell>> {
         if(currentCell.getOy() + 1 < height) {
             currentCell = get(currentCell.getOy() + 1).get(currentCell.getOx());
             currentCell.visit();
+            currentCell.incrementTimesVisited();
             coinsAvailableIfEmpty(currentCell);
             character.setCurrentCoordinates(currentCell);
         }
@@ -124,6 +125,7 @@ public class Grid extends ArrayList<ArrayList<Cell>> {
         if(currentCell.getOx() + 1 < width) {
             currentCell = get(currentCell.getOy()).get(currentCell.getOx() + 1);
             currentCell.visit();
+            currentCell.incrementTimesVisited();
             coinsAvailableIfEmpty(currentCell);
             character.setCurrentCoordinates(currentCell);
         }
@@ -135,6 +137,7 @@ public class Grid extends ArrayList<ArrayList<Cell>> {
         if(currentCell.getOx() - 1 >= 0) {
             currentCell = get(currentCell.getOy()).get(currentCell.getOx() - 1);
             currentCell.visit();
+            currentCell.incrementTimesVisited();
             coinsAvailableIfEmpty(currentCell);
             character.setCurrentCoordinates(currentCell);
         }

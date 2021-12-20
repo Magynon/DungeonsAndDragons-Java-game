@@ -5,6 +5,7 @@ public class Cell {
     private final int Oy;
     private CellElement obj;
     private boolean visited;
+    private int timesVisited;
     public enum CellType {
         EMPTY,
         ENEMY,
@@ -17,6 +18,15 @@ public class Cell {
         this.Ox = Ox;
         this.Oy = Oy;
         visited = false;
+        timesVisited = 0;
+    }
+
+    public void incrementTimesVisited(){
+        timesVisited++;
+    }
+
+    public boolean visitedMoreThanOnce(){
+        return timesVisited != 1;
     }
 
     public void setType(CellType type) {

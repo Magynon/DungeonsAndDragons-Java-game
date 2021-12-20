@@ -14,7 +14,7 @@ public class Inventory {
         potionList = new ArrayList<>();
         this.maxWeight = maxWeight;
         currentWeight = 0;
-        coinNumber = 0;
+        coinNumber = 100;
     }
 
     public void earnCoins(int coins){

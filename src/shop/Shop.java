@@ -10,6 +10,7 @@ public class Shop implements CellElement {
     List<Potion> potionList;
 
     public Shop(){
+
         Random rand = new Random();
         int capacity = rand.nextInt(3) + 2;
         potionList = new ArrayList<>(capacity);
@@ -26,6 +27,13 @@ public class Shop implements CellElement {
         return potionList.remove(index);
     }
 
+    public void lookAround(){
+        System.out.println("This shop has:");
+        for(int i = 0; i < potionList.size(); i++){
+            System.out.println("\t" + (i+1) + " " + potionList.get(i));
+        }
+    }
+
     @Override
     public char toCharacter() {
         return 'S';
@@ -33,8 +41,8 @@ public class Shop implements CellElement {
 
     @Override
     public String toString() {
-        return "Shop{" +
-                "potionList=" + potionList +
-                "}\n";
+        return "This shop has:" +
+                potionList +
+                "\n";
     }
 }

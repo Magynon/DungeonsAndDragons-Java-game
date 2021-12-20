@@ -25,6 +25,19 @@
       "characters": [
         "Mage", "Rogue"
       ]
+    },
+
+    {
+      "country": "Great Britain",
+      "email": "a",
+      "password": "a",
+      "favGames": [
+        "blueWhale", "deepWeb"
+      ],
+      "name": "John Smith",
+      "characters": [
+        "Mage", "Rogue"
+      ]
     }
 
   ],

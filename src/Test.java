@@ -1,10 +1,12 @@
 import exceptions.GridSizeOverflowException;
 import exceptions.InformationIncompleteException;
 import exceptions.InvalidCommandException;
+import exceptions.InventoryFullOrNotEnoughMoneyException;
+
 import java.io.IOException;
 
 public class Test {
-    public static void main(String[] args) throws GridSizeOverflowException, IOException, InformationIncompleteException, InvalidCommandException {
+    public static void main(String[] args) throws GridSizeOverflowException, IOException, InformationIncompleteException, InvalidCommandException, InventoryFullOrNotEnoughMoneyException {
         Game game = Game.getInstance();
         game.run();
     }

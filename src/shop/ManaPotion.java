@@ -31,10 +31,6 @@ public class ManaPotion implements Potion{
 
     @Override
     public String toString() {
-        return "ManaPotion{" +
-                "weight=" + weight +
-                ", price=" + price +
-                ", regen=" + regen +
-                '}';
+        return "Mana Potion: " + weight + " grams, " + price + " coins, " + regen + " regens";
     }
 }

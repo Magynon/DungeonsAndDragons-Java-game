@@ -31,10 +31,6 @@ public class HealthPotion implements Potion{
 
     @Override
     public String toString() {
-        return "HealthPotion{" +
-                "weight=" + weight +
-                ", price=" + price +
-                ", regen=" + regen +
-                '}';
+        return "Health Potion: " + weight + " grams, " + price + " coins, " + regen + " regens";
     }
 }
