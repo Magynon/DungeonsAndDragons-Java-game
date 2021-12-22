@@ -33,6 +33,21 @@ public class Inventory {
         }
     }
 
+    public void showPotions(){
+        System.out.println("List of available potions:\n");
+        for(int i = 0; i < potionList.size(); i++){
+            System.out.println("\t" + (i+1) + " " + potionList.get(i));
+        }
+    }
+
+    public int getPotionNumber(){
+        return potionList.size();
+    }
+
+    public Potion getPotion(int index){
+        return potionList.get(index);
+    }
+
     public Potion removePotion(int index){
         currentWeight -= potionList.get(index).getWeight();
         return potionList.remove(index);
@@ -40,11 +55,10 @@ public class Inventory {
 
     @Override
     public String toString() {
-        return "Inventory{" +
-                "potionList=" + potionList +
-                ", maxWeight=" + maxWeight +
-                ", currentWeight=" + currentWeight +
-                ", coinNumber=" + coinNumber +
-                '}';
+        return "Inventory:" +
+                "\n\tpotionList: " + potionList +
+                "\n\tmaxWeight: " + maxWeight +
+                "\n\tcurrentWeight: " + currentWeight +
+                "\n\tcoinNumber: " + coinNumber;
     }
 }

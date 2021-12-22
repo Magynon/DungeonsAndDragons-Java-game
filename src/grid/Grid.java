@@ -27,10 +27,8 @@ public class Grid extends ArrayList<ArrayList<Cell>> {
         this.height = height;
         Random rand = new Random();
 
-        int enemies = rand.nextInt(width*height - 6) + 4;
-        System.out.println(enemies + " enemies");
-        int shops = rand.nextInt(width*height - enemies - 2) + 2;
-        System.out.println(shops + " shops");
+        int enemies = rand.nextInt(width*height - 7) + 4;
+        int shops = rand.nextInt(width*height - enemies - 3) + 2;
 
         // initialise cells
         for(int i = 0; i < height; i++){
@@ -91,6 +89,7 @@ public class Grid extends ArrayList<ArrayList<Cell>> {
             int random = new Random().nextInt(5);
             if(random == 1){
                 random = new Random().nextInt(20);
+                System.out.println("Wow! Just found " + random + " coins!");
                 character.getInventory().earnCoins(random);
             }
         }
@@ -102,7 +101,6 @@ public class Grid extends ArrayList<ArrayList<Cell>> {
             currentCell.visit();
             currentCell.incrementTimesVisited();
             coinsAvailableIfEmpty(currentCell);
-            character.setCurrentCoordinates(currentCell);
         }
         else
             throw new GridSizeOverflowException("Can't go north!");
@@ -115,7 +113,6 @@ public class Grid extends ArrayList<ArrayList<Cell>> {
             currentCell.visit();
             currentCell.incrementTimesVisited();
             coinsAvailableIfEmpty(currentCell);
-            character.setCurrentCoordinates(currentCell);
         }
         else
             throw new GridSizeOverflowException("Can't go south!");
@@ -127,7 +124,6 @@ public class Grid extends ArrayList<ArrayList<Cell>> {
             currentCell.visit();
             currentCell.incrementTimesVisited();
             coinsAvailableIfEmpty(currentCell);
-            character.setCurrentCoordinates(currentCell);
         }
         else
             throw new GridSizeOverflowException("Can't go east!");
@@ -139,7 +135,6 @@ public class Grid extends ArrayList<ArrayList<Cell>> {
             currentCell.visit();
             currentCell.incrementTimesVisited();
             coinsAvailableIfEmpty(currentCell);
-            character.setCurrentCoordinates(currentCell);
         }
         else
             throw new GridSizeOverflowException("Can't go west!");
@@ -148,6 +143,7 @@ public class Grid extends ArrayList<ArrayList<Cell>> {
     @Override
     public String toString() {
         StringBuilder out = new StringBuilder();
+        out.append("\nGRID:\n");
         for(int i = 0; i < height; i++){
             for(int j = 0; j < width; j++){
                 if(get(i).get(j).isVisited()){

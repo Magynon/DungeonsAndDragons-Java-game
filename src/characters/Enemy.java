@@ -22,12 +22,13 @@ public class Enemy extends Entity implements CellElement {
 
         int abilities = new Random().nextInt(3) + 2;
         spellList = new ArrayList<>(abilities);
+
         for(int i = 0; i < abilities; i++){
-            int ability = new Random().nextInt(4);
-            switch(ability){
-                case 0: spellList.add(new Earth());
-                case 1: spellList.add(new Ice());
-                case 2: spellList.add(new Fire());
+            int ability = new Random().nextInt(3);
+            switch (ability) {
+                case 0 -> spellList.add(new Earth());
+                case 1 -> spellList.add(new Ice());
+                case 2 -> spellList.add(new Fire());
             }
         }
     }
@@ -38,7 +39,7 @@ public class Enemy extends Entity implements CellElement {
     }
 
     @Override
-    void receiveDamage(int damage) {
+    public void receiveDamage(int damage) {
         boolean random = new Random().nextBoolean();
         if(random){
             damage /= 2;
@@ -48,7 +49,7 @@ public class Enemy extends Entity implements CellElement {
     }
 
     @Override
-    int getDamage() {
+    public int getDamage() {
         boolean random = new Random().nextBoolean();
         if(random){
             damage *= 2;
@@ -56,7 +57,7 @@ public class Enemy extends Entity implements CellElement {
         return damage;
     }
 
-    private int onDeathReturnCoins(){
+    public int onDeathReturnCoins(){
         int random = new Random().nextInt(5);
         if(random != 1){
             return new Random().nextInt(20);

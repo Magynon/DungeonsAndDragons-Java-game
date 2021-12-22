@@ -82,10 +82,10 @@ public class JSONParser {
                 cellStories.add(story.getString(j));
             }
 
-            switch(type){
-                case "N": this.stories.put(Cell.CellType.EMPTY, cellStories);
-                case "S": this.stories.put(Cell.CellType.SHOP, cellStories);
-                case "E": this.stories.put(Cell.CellType.ENEMY, cellStories);
+            switch (type) {
+                case "N" -> this.stories.put(Cell.CellType.EMPTY, cellStories);
+                case "S" -> this.stories.put(Cell.CellType.SHOP, cellStories);
+                case "E" -> this.stories.put(Cell.CellType.ENEMY, cellStories);
             }
         }
     }

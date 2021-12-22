@@ -1,4 +1,5 @@
 import characters.Character;
+import characters.Enemy;
 import exceptions.GridSizeOverflowException;
 import exceptions.InformationIncompleteException;
 import exceptions.InvalidCommandException;
@@ -8,10 +9,12 @@ import grid.Grid;
 import json.JSONParser;
 import setup.Account;
 import shop.Shop;
+import spells.Spell;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Scanner;
 
 public class Game {
@@ -19,6 +22,7 @@ public class Game {
     private List<Account> accountList;
     private Map<Cell.CellType, List<String>> stories;
     private Scanner keyboard;
+    private boolean wonLevel = false, stillWantToPlay = true;
 
     private Game(){ }
 
@@ -88,17 +92,39 @@ public class Game {
                 throw new InvalidCommandException();
             }
 
-            // start game with account
-            Grid grid = Grid.getInstance();
-            grid = grid.genMap(10,4, account.getCharacters().get(input-1));
-            System.out.println(grid.showAllGrid());
-            System.out.println(grid + grid.getCurrentCell().getObj().toString() + grid.getCharacter());
-
-            while(true){
-                System.out.print("Choose direction to move (N, S, E or W): ");
-                String direction = keyboard.nextLine();
-                nextMove(direction, grid);
+            System.out.println("Next, you will choose the width and height of the grid. Please be aware" +
+                    " that it must have at least 8 elements.");
+            int width = 0;
+            int height = 0;
+            while(width*height < 8){
+                System.out.print("Enter grid width: ");
+                width = keyboard.nextInt();
+                keyboard.nextLine();
+                System.out.print("Enter grid height: ");
+                height = keyboard.nextInt();
+                keyboard.nextLine();
+                if(width*height < 8){
+                    System.out.println("Wrong sizes, please read the instructions above.");
+                }
             }
+
+            while(stillWantToPlay){
+                // start game with account
+                Grid grid = Grid.getInstance();
+                grid = grid.genMap(width,height, account.getCharacters().get(input-1));
+                System.out.println(grid.showAllGrid());
+                System.out.println(grid);
+
+                while(!wonLevel && stillWantToPlay){
+                    System.out.print("Choose direction to move (N, S, E or W): ");
+                    String direction = keyboard.nextLine();
+                    nextMove(direction, grid);
+                }
+                grid.getCharacter().incLevel();
+                grid.getCharacter().updateTraitsWithLevel();
+                wonLevel = false;
+            }
+            System.out.println("Goodbye, " + account.getInformation().getName() + "!");
         }
 
         // GUI MODE
@@ -112,45 +138,132 @@ public class Game {
     }
 
     public void showStory(Cell element){
-        System.out.println(stories.get(element.getType()).get(0));
+        int length = stories.get(element.getType()).size();
+        int index = new Random().nextInt(length);
+        System.out.println(stories.get(element.getType()).get(index));
     }
 
-    public void nextMove(String direction, Grid grid) throws GridSizeOverflowException, InventoryFullOrNotEnoughMoneyException {
-        switch(direction){
-            case "N": grid.goNorth(); break;
-            case "S": grid.goSouth(); break;
-            case "E": grid.goEast(); break;
-            case "W": grid.goWest(); break;
-            default: System.out.println("Wrong direction: " + direction); return;
+    public void nextMove(String direction, Grid grid) throws GridSizeOverflowException, InventoryFullOrNotEnoughMoneyException, InvalidCommandException {
+        switch (direction) {
+            case "N" -> grid.goNorth();
+            case "S" -> grid.goSouth();
+            case "E" -> grid.goEast();
+            case "W" -> grid.goWest();
+            default -> {
+                System.out.print("Wrong direction: \"" + direction + "\"");
+                return;
+            }
         }
         currentCellAction(grid);
     }
 
-    public void currentCellAction(Grid grid) throws InventoryFullOrNotEnoughMoneyException {
-//        if(!grid.getCurrentCell().visitedMoreThanOnce()){
-//            showStory(grid.getCurrentCell());
-//        }
-        if(grid.getCurrentCell().getObj().toCharacter() == 'S'){
-            System.out.println(grid + grid.getCurrentCell().getObj().toString() + grid.getCharacter());
+    public void currentCellAction(Grid grid) throws InventoryFullOrNotEnoughMoneyException, InvalidCommandException {
+        //System.out.println(grid + grid.getCurrentCell().getObj().toString() + grid.getCharacter());
+        System.out.println(grid);
+
+        if(grid.getCurrentCell().getObj().toCharacter() == 'N' && !grid.getCurrentCell().visitedMoreThanOnce()){
             showStory(grid.getCurrentCell());
-            System.out.println("Should you desire to take a look around the shop? (Y/n)");
+        }
+
+        if(grid.getCurrentCell().getObj().toCharacter() == 'F'){
+            System.out.println("Congratulations, you won!");
+            wonLevel = true;
+            System.out.println("Do you want to play another level? (Y/n) ");
+            stillWantToPlay = !keyboard.nextLine().equals("n");
+        }
+
+        if(grid.getCurrentCell().getObj().toCharacter() == 'S'){
+            showStory(grid.getCurrentCell());
+            System.out.print("Should you desire to take a look around the shop? (Y/n) ");
 
             if(!keyboard.nextLine().equals("n")){
                 Shop shop = (Shop) grid.getCurrentCell().getObj();
                 Character character = grid.getCharacter();
                 shop.lookAround();
-                System.out.println("Do you still want to buy anything? (Y/n)");
-                if(!keyboard.nextLine().equals("n")){
+                System.out.print("Do you still want to buy anything? (Y/n) ");
+                while(!keyboard.nextLine().equals("n")){
                     System.out.print("Choose the potion index: ");
                     int index = keyboard.nextInt() - 1;
                     character.buyPotion(shop.removePotion(index));
+                    System.out.println("Bought potion " + (index+1) + "!");
+
+                    if(shop.isEmpty()){
+                        break;
+                    }
+
+                    shop.lookAround();
+                    System.out.print("Do you still want to buy anything? (Y/n) ");
+                    keyboard.nextLine();
                 }
-                System.out.println("Exited store!");
+                System.out.println("Exited store!\n");
             }
         }
-        // TODO show enemy info
-        if(grid.getCurrentCell().getObj().toCharacter() == 'E') {
-            System.out.println(grid + grid.getCurrentCell().getObj().toString() + grid.getCharacter());
+
+        if(grid.getCurrentCell().getObj().toCharacter() == 'E' && !grid.getCurrentCell().visitedMoreThanOnce()) {
+            Character character = grid.getCharacter();
+            Enemy enemy = (Enemy) grid.getCurrentCell().getObj();
+
+            showStory(grid.getCurrentCell());
+            while(enemy.getCurrentLife() > 0 && character.getCurrentLife() > 0){
+                boolean actionDone = false;
+                System.out.println("STATS:");
+                System.out.print("\tYOU: ");
+                System.out.println("life = " + character.getCurrentLife() + " mana = " + character.getCurrentMana());
+                System.out.print("\tENEMY: ");
+                System.out.println("life = " + enemy.getCurrentLife() + " mana = " + enemy.getCurrentMana());
+
+                while(!actionDone){
+                    System.out.println("YOUR TURN! -------------------------------");
+                    System.out.println("There are 3 options:" +
+                            "\n\t1. attack!" +
+                            "\n\t2. use ability!" +
+                            "\n\t3. use potion!");
+                    System.out.print("Choose your move: ");
+                    int index = keyboard.nextInt() - 1;
+                    switch (index) {
+                        case 0 -> {
+                            enemy.receiveDamage(character.getDamage());
+                            actionDone = true;
+                        }
+                        case 1 -> {
+                            character.useAbility(character.getSpell(), enemy);
+                            actionDone = true;
+                        }
+                        case 2 -> {
+                            if(character.getInventory().getPotionNumber() == 0){
+                                System.out.println("No potions available!");
+                            }
+                            else{
+                                character.getInventory().showPotions();
+                                System.out.print("Choose potion: ");
+                                int potionIndex = keyboard.nextInt() - 1;
+                                System.out.println("Chose " + character.getInventory().getPotion(potionIndex));
+                                character.usePotion(potionIndex);
+                                actionDone = true;
+                            }
+                        }
+                        default -> System.out.println("Invalid choice, try again!");
+                    }
+                }
+
+                // enemy's turn
+                if(enemy.getCurrentLife() > 0){
+                    System.out.println("ENEMY's TURN! -------------------------------");
+                    Spell spell = enemy.getSpell();
+                    enemy.useAbility(spell, character);
+                }
+            }
+            if(enemy.getCurrentLife() <= 0){
+                int earnedCoins = enemy.onDeathReturnCoins();
+                character.getInventory().earnCoins(earnedCoins);
+                System.out.println("Congratulations, the enemy was defeated" +
+                        " and you won " + earnedCoins + " coins!");
+            }
+            else{
+                System.out.println("You have been defeated. The future is black.");
+                stillWantToPlay = false;
+            }
+            keyboard.nextLine();
         }
     }
 

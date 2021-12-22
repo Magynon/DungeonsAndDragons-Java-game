@@ -6,15 +6,15 @@ import visitor.Visitor;
 public class Warrior extends Character{
     public Warrior(){
         inventory = new Inventory(100);
-        strength = ((double)level / 2) * 100;
-        charisma = ((double)level / 6) * 100;
-        dexterity = ((double)level / 3) * 100;
+        updateTraitsWithLevel();
         fire = true;
+        currentLife = maxLife;
+        currentMana = maxMana;
         name = "Warrior";
     }
 
     @Override
-    void receiveDamage(int damage) {
+    public void receiveDamage(int damage) {
         if(dexterity > charisma + 45){
             damage /= 2;
         }
@@ -22,12 +22,19 @@ public class Warrior extends Character{
     }
 
     @Override
-    int getDamage() {
-        int damage = (int)(3/4 * strength + 1/8 * dexterity + 1/8 * charisma);
+    public int getDamage() {
+        int damage = (int)(3 * strength / 4 + dexterity / 8 + charisma / 8)/2;
         if(strength > dexterity + 70*level){
             damage *= 2;
         }
         return damage;
+    }
+
+    @Override
+    public void updateTraitsWithLevel() {
+        strength = ((double)level / 2) * 100;
+        charisma = ((double)level / 6) * 100;
+        dexterity = ((double)level / 3) * 100;
     }
 
     @Override

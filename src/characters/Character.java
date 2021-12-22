@@ -2,12 +2,12 @@ package characters;
 
 import exceptions.InventoryFullOrNotEnoughMoneyException;
 import grid.Cell;
+import shop.HealthPotion;
 import shop.Inventory;
 import shop.Potion;
 
 abstract public class Character extends Entity{
     protected String name;
-    private int Ox, Oy;
     protected int xp;
     protected int level = 1;
     protected double strength, charisma, dexterity;
@@ -25,23 +25,29 @@ abstract public class Character extends Entity{
         inventory.addPotion(potion);
     }
 
-    public void setCurrentCoordinates(Cell currentCell){
-        Ox = currentCell.getOx();
-        Oy = currentCell.getOy();
+    public void usePotion(int index){
+        Potion potion = getInventory().getPotion(index);
+        if(potion instanceof HealthPotion){
+            lifeRegeneration(potion.getRegen());
+        }
+        else{
+            manaRegeneration(potion.getRegen());
+        }
+        getInventory().removePotion(index);
+    }
+
+    abstract public void updateTraitsWithLevel();
+
+    public void incLevel(){
+        level++;
     }
 
     @Override
     public String toString() {
-        return "Character{" +
-                "name='" + name + '\'' +
-                ", Ox=" + Ox +
-                ", Oy=" + Oy +
-                ", xp=" + xp +
+        return name +
+                ": xp=" + xp +
                 ", level=" + level +
-                ", strength=" + strength +
-                ", charisma=" + charisma +
-                ", dexterity=" + dexterity +
                 ", inventory=" + inventory +
-                "}\n";
+                "\n";
     }
 }

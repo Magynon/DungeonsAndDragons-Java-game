@@ -10,11 +10,6 @@ public class HealthPotion implements Potion{
     }
 
     @Override
-    public void usePotion() {
-
-    }
-
-    @Override
     public int getPrice() {
         return price;
     }
