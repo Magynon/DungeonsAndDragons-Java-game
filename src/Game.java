@@ -143,21 +143,23 @@ public class Game {
         System.out.println(stories.get(element.getType()).get(index));
     }
 
-    public void nextMove(String direction, Grid grid) throws GridSizeOverflowException, InventoryFullOrNotEnoughMoneyException, InvalidCommandException {
+    public void nextMove(String direction, Grid grid) throws InventoryFullOrNotEnoughMoneyException {
+        boolean goodMove = false;
         switch (direction) {
-            case "N" -> grid.goNorth();
-            case "S" -> grid.goSouth();
-            case "E" -> grid.goEast();
-            case "W" -> grid.goWest();
-            default -> {
-                System.out.print("Wrong direction: \"" + direction + "\"");
-                return;
-            }
+            case "N" -> goodMove = grid.goNorth();
+            case "S" -> goodMove = grid.goSouth();
+            case "E" -> goodMove = grid.goEast();
+            case "W" -> goodMove = grid.goWest();
         }
-        currentCellAction(grid);
+        if(goodMove){
+            currentCellAction(grid);
+        }
+        else{
+            System.out.println("Wrong move, try again!");
+        }
     }
 
-    public void currentCellAction(Grid grid) throws InventoryFullOrNotEnoughMoneyException, InvalidCommandException {
+    public void currentCellAction(Grid grid) throws InventoryFullOrNotEnoughMoneyException {
         //System.out.println(grid + grid.getCurrentCell().getObj().toString() + grid.getCharacter());
         System.out.print(grid);
 

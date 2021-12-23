@@ -2,7 +2,6 @@ package grid;
 
 import characters.Character;
 import characters.Enemy;
-import exceptions.GridSizeOverflowException;
 import shop.Shop;
 
 import java.util.ArrayList;
@@ -84,7 +83,7 @@ public class Grid extends ArrayList<ArrayList<Cell>> {
     }
 
     // check if coins are available in cell, in case it is empty
-    private void coinsAvailableIfEmpty(Cell cell){
+    private void coinsAvailableIfEmpty(){
         if(currentCell.getType() == Cell.CellType.EMPTY){
             int random = new Random().nextInt(5);
             if(random == 1){
@@ -95,48 +94,52 @@ public class Grid extends ArrayList<ArrayList<Cell>> {
         }
     }
 
-    public void goNorth() throws GridSizeOverflowException {
+    public boolean goNorth(){
         if(currentCell.getOy() - 1 >= 0) {
             currentCell = get(currentCell.getOy() - 1).get(currentCell.getOx());
             currentCell.visit();
             currentCell.incrementTimesVisited();
-            coinsAvailableIfEmpty(currentCell);
+            coinsAvailableIfEmpty();
+            return true;
         }
         else
-            throw new GridSizeOverflowException("Can't go north!");
+            return false;
     }
 
-    public void goSouth() throws GridSizeOverflowException {
+    public boolean goSouth(){
         if(currentCell.getOy() + 1 < height) {
             currentCell = get(currentCell.getOy() + 1).get(currentCell.getOx());
             currentCell.visit();
             currentCell.incrementTimesVisited();
-            coinsAvailableIfEmpty(currentCell);
+            coinsAvailableIfEmpty();
+            return true;
         }
         else
-            throw new GridSizeOverflowException("Can't go south!");
+            return false;
     }
 
-    public void goEast() throws GridSizeOverflowException {
+    public boolean goEast(){
         if(currentCell.getOx() + 1 < width) {
             currentCell = get(currentCell.getOy()).get(currentCell.getOx() + 1);
             currentCell.visit();
             currentCell.incrementTimesVisited();
-            coinsAvailableIfEmpty(currentCell);
+            coinsAvailableIfEmpty();
+            return true;
         }
         else
-            throw new GridSizeOverflowException("Can't go east!");
+            return false;
     }
 
-    public void goWest() throws GridSizeOverflowException {
+    public boolean goWest(){
         if(currentCell.getOx() - 1 >= 0) {
             currentCell = get(currentCell.getOy()).get(currentCell.getOx() - 1);
             currentCell.visit();
             currentCell.incrementTimesVisited();
-            coinsAvailableIfEmpty(currentCell);
+            coinsAvailableIfEmpty();
+            return true;
         }
         else
-            throw new GridSizeOverflowException("Can't go west!");
+            return false;
     }
 
     @Override
