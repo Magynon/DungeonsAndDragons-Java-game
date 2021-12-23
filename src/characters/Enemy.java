@@ -15,7 +15,7 @@ public class Enemy extends Entity implements CellElement {
     public Enemy(){
         currentLife = new Random().nextInt(50) + 50;
         currentMana = new Random().nextInt(50) + 50;
-        damage = (int) (currentLife*0.5);
+        damage = (int) (currentLife*0.15);
         fire = new Random().nextBoolean();
         earth = !fire && new Random().nextBoolean();
         ice = !fire && !earth && new Random().nextBoolean();
@@ -45,7 +45,7 @@ public class Enemy extends Entity implements CellElement {
             damage /= 2;
         }
         currentLife -= damage;
-        this.damage = (int) (currentLife*0.5);
+        this.damage = (int) (currentLife*0.15);
     }
 
     @Override

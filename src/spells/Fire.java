@@ -5,7 +5,7 @@ import characters.Entity;
 public class Fire extends Spell{
     public Fire(){
         damage = 20;
-        mana = 20;
+        mana = 13;
     }
 
     @Override

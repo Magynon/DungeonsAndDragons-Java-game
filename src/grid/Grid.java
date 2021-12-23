@@ -107,7 +107,6 @@ public class Grid extends ArrayList<ArrayList<Cell>> {
     }
 
     public void goSouth() throws GridSizeOverflowException {
-        int random;
         if(currentCell.getOy() + 1 < height) {
             currentCell = get(currentCell.getOy() + 1).get(currentCell.getOx());
             currentCell.visit();
@@ -147,7 +146,13 @@ public class Grid extends ArrayList<ArrayList<Cell>> {
         for(int i = 0; i < height; i++){
             for(int j = 0; j < width; j++){
                 if(get(i).get(j).isVisited()){
-                    out.append(get(i).get(j).getObj().toCharacter()).append(" ");
+                    if(currentCell.getOx() == j && currentCell.getOy() == i){
+                        char character = get(i).get(j).getObj().toCharacter();
+                        out.append(java.lang.Character.toLowerCase(character)).append(" ");
+                    }
+                    else{
+                        out.append(get(i).get(j).getObj().toCharacter()).append(" ");
+                    }
                 }
                 else{
                     out.append("? ");

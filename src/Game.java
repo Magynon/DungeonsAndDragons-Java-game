@@ -159,7 +159,7 @@ public class Game {
 
     public void currentCellAction(Grid grid) throws InventoryFullOrNotEnoughMoneyException, InvalidCommandException {
         //System.out.println(grid + grid.getCurrentCell().getObj().toString() + grid.getCharacter());
-        System.out.println(grid);
+        System.out.print(grid);
 
         if(grid.getCurrentCell().getObj().toCharacter() == 'N' && !grid.getCurrentCell().visitedMoreThanOnce()){
             showStory(grid.getCurrentCell());
@@ -226,8 +226,11 @@ public class Game {
                             actionDone = true;
                         }
                         case 1 -> {
-                            character.useAbility(character.getSpell(), enemy);
-                            actionDone = true;
+                            Spell spell = character.getSpell();
+                            if(spell.getMana() <= character.getCurrentMana()){
+                                actionDone = true;
+                            }
+                            character.useAbility(spell, enemy);
                         }
                         case 2 -> {
                             if(character.getInventory().getPotionNumber() == 0){
@@ -249,8 +252,25 @@ public class Game {
                 // enemy's turn
                 if(enemy.getCurrentLife() > 0){
                     System.out.println("ENEMY's TURN! -------------------------------");
-                    Spell spell = enemy.getSpell();
-                    enemy.useAbility(spell, character);
+                    int chance = new Random().nextInt(4);
+                    if(chance == 0){
+                        Spell spell = enemy.getSpell();
+                        if(spell == null){
+                            System.out.println("Enemy attacked you!");
+                            character.receiveDamage(enemy.getDamage());
+                        }
+                        else{
+                            enemy.useAbility(spell, character);
+                            if(enemy.getCurrentMana() < spell.getMana()){
+                                System.out.println("Enemy attacked you!");
+                                character.receiveDamage(enemy.getDamage());
+                            }
+                        }
+                    }
+                    else{
+                        System.out.println("Enemy attacked you!");
+                        character.receiveDamage(enemy.getDamage());
+                    }
                 }
             }
             if(enemy.getCurrentLife() <= 0){

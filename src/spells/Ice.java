@@ -5,7 +5,7 @@ import characters.Entity;
 public class Ice extends Spell{
     public Ice(){
         damage = 10;
-        mana = 25;
+        mana = 15;
     }
 
     @Override

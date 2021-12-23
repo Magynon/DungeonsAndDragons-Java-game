@@ -32,8 +32,11 @@ public abstract class Entity implements Element {
         }
         else{
             int size = spellList.size();
+            if(size == 0){
+                return null;
+            }
             int index = new Random().nextInt(size);
-            return spellList.get(index);
+            return spellList.remove(index);
         }
         return null;
     }
@@ -111,6 +114,7 @@ public abstract class Entity implements Element {
         else{
             if(enemy instanceof Enemy) {
                 System.out.println("Not enough mana to use spell! Currently: " + currentMana);
+                System.out.println("Try again (attack or use potion)!");
             }
             else{
                 System.out.println("Turns out the enemy is out of mana. You're in luck, finish him!");
