@@ -7,7 +7,6 @@ import spells.Spell;
 import visitor.Element;
 
 import java.util.List;
-import java.util.Random;
 
 public abstract class Entity implements Element {
     protected int maxLife = 100, maxMana = 100;
@@ -19,26 +18,10 @@ public abstract class Entity implements Element {
     abstract public int getDamage();
 
     public Spell getSpell(){
-        if(this instanceof Character){
-            if(ice){
-                return new Ice();
-            }
-            if(fire){
-                return new Fire();
-            }
-            if(earth){
-                return new Earth();
-            }
+        if(spellList.size() == 0){
+            return null;
         }
-        else{
-            int size = spellList.size();
-            if(size == 0){
-                return null;
-            }
-            int index = new Random().nextInt(size);
-            return spellList.remove(index);
-        }
-        return null;
+        return spellList.remove(0);
     }
 
     public void lifeRegeneration(int val){

@@ -29,6 +29,9 @@ public class JSONParser {
 
     public JSONParser() throws IOException, InformationIncompleteException {
         Path location = Path.of("src/json/input.json");
+        //Path location = Path.of("input.json");
+        System.out.println(location.toAbsolutePath());
+
         String json = Files.readString(location);
         JSONObject object = new JSONObject(json);
         JSONArray accounts = object.getJSONArray("accounts");

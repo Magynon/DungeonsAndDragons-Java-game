@@ -1,7 +1,5 @@
 package characters;
 
-import exceptions.InventoryFullOrNotEnoughMoneyException;
-import grid.Cell;
 import shop.HealthPotion;
 import shop.Inventory;
 import shop.Potion;
@@ -12,6 +10,15 @@ abstract public class Character extends Entity{
     protected int level = 1;
     protected double strength, charisma, dexterity;
     protected Inventory inventory;
+    private int enemiesDefeated = 0;
+
+    public void newEnemyDefeated(){
+        enemiesDefeated++;
+    }
+
+    public int getEnemiesDefeated() {
+        return enemiesDefeated;
+    }
 
     public Inventory getInventory() {
         return inventory;
@@ -21,7 +28,7 @@ abstract public class Character extends Entity{
         return name;
     }
 
-    public void buyPotion(Potion potion) throws InventoryFullOrNotEnoughMoneyException {
+    public void buyPotion(Potion potion){
         inventory.addPotion(potion);
     }
 

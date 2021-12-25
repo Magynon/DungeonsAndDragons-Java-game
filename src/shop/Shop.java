@@ -15,7 +15,10 @@ public class Shop implements CellElement {
         int capacity = rand.nextInt(3) + 2;
         potionList = new ArrayList<>(capacity);
 
-        for(int i = 0; i < capacity; i++){
+        potionList.add(new HealthPotion(20, 1, 20));
+        potionList.add(new ManaPotion(10, 5, 10));
+
+        for(int i = 0; i < capacity-2; i++){
             if(rand.nextBoolean())
                 potionList.add(new HealthPotion(20, 1, 20));
             else
@@ -32,6 +35,24 @@ public class Shop implements CellElement {
         for(int i = 0; i < potionList.size(); i++){
             System.out.println("\t" + (i+1) + " " + potionList.get(i));
         }
+    }
+
+    public int getManaPotionIndex(){
+        for(Potion i : potionList){
+            if(i instanceof ManaPotion){
+                return potionList.indexOf(i);
+            }
+        }
+        return -1;
+    }
+
+    public int getHealthPotionIndex(){
+        for(Potion i : potionList){
+            if(i instanceof HealthPotion){
+                return potionList.indexOf(i);
+            }
+        }
+        return -1;
     }
 
     public boolean isEmpty(){

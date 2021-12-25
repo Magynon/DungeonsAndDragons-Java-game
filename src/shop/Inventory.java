@@ -14,27 +14,27 @@ public class Inventory {
         potionList = new ArrayList<>();
         this.maxWeight = maxWeight;
         currentWeight = 0;
-        coinNumber = 100;
+        coinNumber = 50;
     }
 
     public void earnCoins(int coins){
         coinNumber += coins;
     }
 
-    public void addPotion(Potion potion) throws InventoryFullOrNotEnoughMoneyException {
+    public void addPotion(Potion potion) {
         if(currentWeight + potion.getWeight() <= maxWeight
                 && coinNumber >= potion.getPrice()){
             potionList.add(potion);
             currentWeight += potion.getWeight();
             coinNumber -= potion.getPrice();
         }
-        else{
-            throw new InventoryFullOrNotEnoughMoneyException();
+        else {
+            System.out.println("Inventory full or not enough coins!");
         }
     }
 
     public void showPotions(){
-        System.out.println("List of available potions:\n");
+        System.out.println("List of available potions:");
         for(int i = 0; i < potionList.size(); i++){
             System.out.println("\t" + (i+1) + " " + potionList.get(i));
         }

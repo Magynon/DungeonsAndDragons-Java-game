@@ -1,7 +1,11 @@
 package characters;
 
 import shop.Inventory;
+import spells.Earth;
 import visitor.Visitor;
+
+import java.util.ArrayList;
+import java.util.Random;
 
 public class Rogue extends Character{
     public Rogue(){
@@ -11,6 +15,13 @@ public class Rogue extends Character{
         currentLife = maxLife;
         currentMana = maxMana;
         name = "Rogue";
+
+        int abilities = new Random().nextInt(3) + 2;
+        spellList = new ArrayList<>(abilities);
+
+        for(int i = 0; i < abilities; i++){
+            spellList.add(new Earth());
+        }
     }
 
     @Override

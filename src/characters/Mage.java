@@ -1,7 +1,13 @@
 package characters;
 
 import shop.Inventory;
+import spells.Earth;
+import spells.Fire;
+import spells.Ice;
 import visitor.Visitor;
+
+import java.util.ArrayList;
+import java.util.Random;
 
 public class Mage extends Character{
     public Mage(){
@@ -11,6 +17,13 @@ public class Mage extends Character{
         currentLife = maxLife;
         currentMana = maxMana;
         name = "Mage";
+
+        int abilities = new Random().nextInt(3) + 2;
+        spellList = new ArrayList<>(abilities);
+
+        for(int i = 0; i < abilities; i++){
+            spellList.add(new Ice());
+        }
     }
 
     public void updateTraitsWithLevel(){
