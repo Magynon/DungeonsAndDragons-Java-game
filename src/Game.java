@@ -1,3 +1,4 @@
+import GUI.GUI;
 import characters.Character;
 import characters.Enemy;
 import exceptions.InformationIncompleteException;
@@ -28,7 +29,7 @@ public class Game {
         return game;
     }
 
-    public void runTest() throws InvalidCommandException, InformationIncompleteException, IOException {
+    public void runTest() throws InformationIncompleteException, IOException {
         int i;
 
         // choose playing mode
@@ -281,13 +282,14 @@ public class Game {
         // choose playing mode
         System.out.println("Choose mode:\n\t1 - Terminal\n\t2 - GUI");
         System.out.print("Enter choice: ");
-        int mode = keyboard.nextInt();
+        //int mode = keyboard.nextInt();
+        int mode = 2;
+
+        // parse input
+        parser();
 
         // TERMINAL MODE
         if(mode == 1) {
-            // parse input
-            parser();
-
             // choose account to play with
             System.out.println("Please choose an account from the following list:");
             for(i = 0; i < accountList.size(); i++){
@@ -372,6 +374,7 @@ public class Game {
         // GUI MODE
         else if (mode == 2){
             System.out.println("GUI");
+            GUI gui = new GUI(accountList);
         }
         else{
             throw new InvalidCommandException();
