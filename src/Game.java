@@ -374,7 +374,7 @@ public class Game {
         // GUI MODE
         else if (mode == 2){
             System.out.println("GUI");
-            GUI gui = new GUI(accountList);
+            GUI gui = new GUI(accountList, stories);
         }
         else{
             throw new InvalidCommandException();

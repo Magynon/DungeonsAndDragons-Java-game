@@ -8,7 +8,6 @@ import java.util.HashSet;
 public class Account {
     final private Information information;
     final private ArrayList<characters.Character> characters;
-    private int numberOfPlayedGames = 0;
 
     public Account(Information information, ArrayList<characters.Character> characters){
         this.information = information;
@@ -23,20 +22,11 @@ public class Account {
         return information;
     }
 
-    public int getNumberOfPlayedGames() {
-        return numberOfPlayedGames;
-    }
-
-    public void incrementNumberOfPlayedGames(){
-        numberOfPlayedGames++;
-    }
-
     @Override
     public String toString() {
         return "Account:\n" +
                 information +
-                "\nCharacters: " + characters +
-                "\nNumberOfPlayedGames: " + numberOfPlayedGames;
+                "\nCharacters: " + characters;
     }
 
     public static class Information{
