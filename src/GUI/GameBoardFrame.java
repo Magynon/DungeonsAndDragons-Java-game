@@ -9,10 +9,8 @@ import spells.Spell;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Scanner;
 
 public class GameBoardFrame extends JFrame{
     private final int gridWidth;
@@ -21,6 +19,9 @@ public class GameBoardFrame extends JFrame{
     private boolean won = false, notDead = true;
     private final Map<Cell.CellType, List<String>> stories;
     private Scanner keyboard;
+    private JLabel charStats, enemyStats;
+    private JPanel GUIGrid;
+    private List<JLabel> labelList;
 
     public GameBoardFrame(int gridWidth, int gridHeight, characters.Character character, Map<Cell.CellType, List<String>> stories){
         super("World Of Marcel");
@@ -35,6 +36,35 @@ public class GameBoardFrame extends JFrame{
         setMinimumSize(new Dimension(width, height));
         setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
 
+        JPanel emptyPanel = new JPanel();
+        emptyPanel.setMaximumSize(new Dimension(width, height/10));
+        add(emptyPanel);
+
+        JPanel stats = new JPanel();
+        stats.setLayout(new BoxLayout(stats, BoxLayout.X_AXIS));
+        stats.setMaximumSize(new Dimension((int) (width/1.5), height/10));
+
+        JPanel charStatsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        charStats = new JLabel();
+        charStats.setFont(new Font("Serif", Font.BOLD, 18));
+        charStatsPanel.add(charStats);
+
+        JPanel enemyStatsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        enemyStats = new JLabel();
+        enemyStats.setHorizontalAlignment(SwingConstants.RIGHT);
+        enemyStats.setFont(new Font("Serif", Font.BOLD, 18));
+        enemyStatsPanel.add(enemyStats);
+
+        updateStats();
+
+        stats.add(charStatsPanel);
+        stats.add(enemyStatsPanel);
+        add(stats);
+
+        GUIGrid = new JPanel(new GridLayout(gridHeight, gridWidth));
+        labelList = new ArrayList<>(gridHeight*gridWidth);
+        add(GUIGrid);
+
         runGUI();
 
         setVisible(true);
@@ -45,21 +75,82 @@ public class GameBoardFrame extends JFrame{
         // start game with account
         Grid grid = Grid.getInstance();
         grid = grid.genMap(gridWidth, gridHeight, character);
+        initLabelList();
+        updateGrid(grid);
+
         System.out.println(grid.showAllGrid());
         System.out.println(grid);
 
-        while(!won && notDead){
-            System.out.print("Choose direction to move (N, S, E or W): ");
-            String direction = "TODO direction";
-            nextMove(direction, grid);
-        }
-        grid.getCharacter().incLevel();
-        grid.getCharacter().updateTraitsWithLevel();
-
-        System.out.println("Goodbye!");
+//        while(!won && notDead){
+//            System.out.print("Choose direction to move (N, S, E or W): ");
+//            String direction = "TODO direction";
+//            nextMove(direction, grid);
+//        }
+//        grid.getCharacter().incLevel();
+//        grid.getCharacter().updateTraitsWithLevel();
+//
+//        System.out.println("Goodbye!");
     }
 
-    public void showStory(Cell element){
+    private void initLabelList(){
+        for(int i = 0; i < gridHeight; i++) {
+            for (int j = 0; j < gridWidth; j++) {
+                labelList.add(new JLabel());
+            }
+        }
+    }
+
+    private void updateGrid(Grid grid){
+        for(int i = 0; i < gridHeight; i++) {
+            for (int j = 0; j < gridWidth; j++) {
+                JLabel current = new JLabel();
+                if(grid.get(i).get(j).isVisited()){
+                    ImageIcon icon;
+                    char character = grid.get(i).get(j).getObj().toCharacter();
+
+                    if(grid.getCurrentCell().getOx() == j && grid.getCurrentCell().getOy() == i){
+                        current.setForeground(Color.red);
+                    }
+
+                    switch(character){
+                        case 'N' -> {
+                            current.setForeground(Color.gray);
+                        }
+                        case 'E' -> {
+                            icon = new ImageIcon("/home/magy/IdeaProjects/WorldOfMarcel/res/angry.svg");
+                            current.setIcon(icon);
+                        }
+                        case 'S' -> {
+                            icon = new ImageIcon("/home/magy/IdeaProjects/WorldOfMarcel/res/store.svg");
+                            current.setIcon(icon);
+                        }
+                        case 'F' -> {
+                            icon = new ImageIcon("/home/magy/IdeaProjects/WorldOfMarcel/res/check.svg");
+                            current.setIcon(icon);
+                        }
+                    }
+                }
+                else{
+                    ImageIcon icon = new ImageIcon("res/question.svg");
+                    current.setIcon(icon);
+                }
+                labelList.set(i*gridHeight + j, current);
+            }
+        }
+        GUIGrid.removeAll();
+        for(JLabel label : labelList){
+            GUIGrid.add(label);
+        }
+    }
+
+    private void updateStats(){
+        charStats.removeAll();
+        enemyStats.removeAll();
+        charStats.setText("<html>Your life: " + character.getCurrentLife() + "<br>Your mana: " + character.getCurrentMana() + "</html>");
+        enemyStats.setText("<html><p style=\"text-align:right;\">" + character.getCurrentLife() + " :enemy's life</p>" + character.getCurrentMana() + " :enemy's mana</html>");
+    }
+
+    private void showStory(Cell element){
         int length = stories.get(element.getType()).size();
         int index = new Random().nextInt(length);
         System.out.println(stories.get(element.getType()).get(index));
