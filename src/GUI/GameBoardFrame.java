@@ -8,7 +8,9 @@ import shop.Shop;
 import spells.Spell;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.util.*;
 import java.util.List;
 
@@ -20,8 +22,9 @@ public class GameBoardFrame extends JFrame{
     private final Map<Cell.CellType, List<String>> stories;
     private Scanner keyboard;
     private JLabel charStats, enemyStats;
-    private JPanel GUIGrid;
+    private JPanel GUIGrid, storyScreen;
     private List<JLabel> labelList;
+    private JTextArea storyField;
 
     public GameBoardFrame(int gridWidth, int gridHeight, characters.Character character, Map<Cell.CellType, List<String>> stories){
         super("World Of Marcel");
@@ -62,8 +65,54 @@ public class GameBoardFrame extends JFrame{
         add(stats);
 
         GUIGrid = new JPanel(new GridLayout(gridHeight, gridWidth));
+        GUIGrid.setMaximumSize(new Dimension((int) (width/1.3), (int) (height/1.7)));
         labelList = new ArrayList<>(gridHeight*gridWidth);
         add(GUIGrid);
+
+        JPanel controls = new JPanel();
+        controls.setMaximumSize(new Dimension((int) (width/1.3), (int) (height/4)));
+
+        // story label
+        JPanel storyPlace = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        storyPlace.setMinimumSize(new Dimension((int) (width/1.3*0.7), height/5));
+        storyField = new JTextArea(8, 35);
+        storyField.setLineWrap(true);
+        storyField.setEditable(false);
+        storyField.setText("Story here");
+        storyField.setMinimumSize(new Dimension((int) (width/1.3*0.7), height/5));
+        storyField.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
+
+        storyPlace.add(storyField);
+        controls.add(storyPlace);
+
+        // buttons
+        JPanel buttonsContainer = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        buttonsContainer.setMaximumSize(new Dimension((int) (width/4), (int) (height/5)));
+        JPanel buttons = new JPanel(new GridLayout(3,3));
+
+        Icon icon = new ImageIcon("/home/magy/IdeaProjects/WorldOfMarcel/res/angle-up.png");
+        JButton up = new JButton(icon);
+        icon = new ImageIcon("/home/magy/IdeaProjects/WorldOfMarcel/res/angle-down.png");
+        JButton down = new JButton(icon);
+        icon = new ImageIcon("/home/magy/IdeaProjects/WorldOfMarcel/res/angle-left.png");
+        JButton left = new JButton(icon);
+        icon = new ImageIcon("/home/magy/IdeaProjects/WorldOfMarcel/res/angle-right.png");
+        JButton right = new JButton(icon);
+
+        buttons.add(new JLabel());
+        buttons.add(up);
+        buttons.add(new JLabel());
+        buttons.add(left);
+        buttons.add(new JLabel());
+        buttons.add(right);
+        buttons.add(new JLabel());
+        buttons.add(down);
+        buttons.add(new JLabel());
+
+        buttonsContainer.add(buttons);
+        controls.add(buttonsContainer);
+
+        add(controls);
 
         runGUI();
 
@@ -101,6 +150,10 @@ public class GameBoardFrame extends JFrame{
     }
 
     private void updateGrid(Grid grid){
+        int length = stories.get(grid.getCurrentCell().getType()).size();
+        int index = new Random().nextInt(length);
+        storyField.setText(stories.get(grid.getCurrentCell().getType()).get(index));
+
         for(int i = 0; i < gridHeight; i++) {
             for (int j = 0; j < gridWidth; j++) {
                 JLabel current = new JLabel();
@@ -109,7 +162,8 @@ public class GameBoardFrame extends JFrame{
                     char character = grid.get(i).get(j).getObj().toCharacter();
 
                     if(grid.getCurrentCell().getOx() == j && grid.getCurrentCell().getOy() == i){
-                        current.setForeground(Color.red);
+                        current.setBackground(Color.red);
+                        current.setOpaque(true);
                     }
 
                     switch(character){
@@ -117,23 +171,33 @@ public class GameBoardFrame extends JFrame{
                             current.setForeground(Color.gray);
                         }
                         case 'E' -> {
-                            icon = new ImageIcon("/home/magy/IdeaProjects/WorldOfMarcel/res/angry.svg");
+                            icon = new ImageIcon("/home/magy/IdeaProjects/WorldOfMarcel/res/angry.png");
+                            Image image = icon.getImage();
+                            Image newImage = image.getScaledInstance(100, 100,  Image.SCALE_DEFAULT);
+                            icon = new ImageIcon(newImage);
                             current.setIcon(icon);
+                            //Image newImage = fitimage(image, 200, 200);
+
                         }
                         case 'S' -> {
-                            icon = new ImageIcon("/home/magy/IdeaProjects/WorldOfMarcel/res/store.svg");
+                            icon = new ImageIcon("/home/magy/IdeaProjects/WorldOfMarcel/res/store.png");
                             current.setIcon(icon);
                         }
                         case 'F' -> {
-                            icon = new ImageIcon("/home/magy/IdeaProjects/WorldOfMarcel/res/check.svg");
+                            icon = new ImageIcon("/home/magy/IdeaProjects/WorldOfMarcel/res/check.png");
                             current.setIcon(icon);
                         }
                     }
                 }
                 else{
-                    ImageIcon icon = new ImageIcon("res/question.svg");
+                    ImageIcon icon = new ImageIcon("/home/magy/IdeaProjects/WorldOfMarcel/res/question.png");
+                    Image image = icon.getImage();
+                    Image newImage = image.getScaledInstance(50, 50,  Image.SCALE_SMOOTH);
+                    icon = new ImageIcon(newImage);
                     current.setIcon(icon);
                 }
+                current.setHorizontalAlignment(SwingConstants.CENTER);
+                current.setBorder(BorderFactory.createLineBorder(Color.BLACK, 3));
                 labelList.set(i*gridHeight + j, current);
             }
         }

@@ -9,6 +9,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
 
 public class GUI extends JFrame implements ActionListener {
     private final JList<String> accountJList;
@@ -99,65 +100,70 @@ public class GUI extends JFrame implements ActionListener {
 
         String name = accountJList.getSelectedValue();
         for(Account account : accountList){
-            if(account.getInformation().getName().equals(name)){
-                System.out.println(account.getInformation().getCredentials().getEmail());
-                final JFrame parent = new JFrame();
-                String password = JOptionPane.showInputDialog(parent,
-                        "Please input the password!", null);
-                if(password.equals(account.getInformation().getCredentials().getPassword())){
-                    Object[] charList = new Object[account.getCharacters().size()];
-
-                    for(int i = 0; i < account.getCharacters().size(); i++){
-                        charList[i] = i + " " + account.getCharacters().get(i).getName();
-                    }
-                    JFrame charFrame = new JFrame();
-                    String character = (String) JOptionPane.showInputDialog(
-                            charFrame,
-                            "Choose a character!",
-                            "Character input",
-                            JOptionPane.PLAIN_MESSAGE,
-                            null,
-                            charList,
-                            "Pick one"
-                    );
-
-                    JTextField widthField = new JTextField(5);
-                    JTextField heightField = new JTextField(5);
-
-                    JPanel dimensions = new JPanel();
-                    dimensions.add(new JLabel("Width: "));
-                    dimensions.add(widthField);
-                    dimensions.add(new JLabel("Height: "));
-                    dimensions.add(heightField);
-
-                    int gridWidth = 0;
-                    int gridHeight = 0;
-
-                    while(gridHeight * gridWidth < 8){
-                        int res = JOptionPane.showConfirmDialog(
-                                null,
-                                dimensions,
-                                "Grid dim's: WxH > 7!",
-                                JOptionPane.OK_CANCEL_OPTION
-                        );
-
-                        if(res == JOptionPane.CANCEL_OPTION){
-                            System.exit(0);
-                        }
-
-                        gridWidth = Integer.parseInt(widthField.getText());
-                        gridHeight = Integer.parseInt(heightField.getText());
-                        System.out.println("Width: " + gridWidth + "; height: " + gridHeight);
-                    }
-
-                    new GameBoardFrame(gridWidth, gridHeight, account.getCharacters().get(character.charAt(0)), stories);
-                    dispose();
-                }
-                else{
-                    System.out.println("Wrong password! Try again");
-                    panel3.setVisible(true);
-                }
-            }
+            new GameBoardFrame(5, 5, account.getCharacters().get(0), stories);
+            dispose();
+            break;
+//            if(account.getInformation().getName().equals(name)){
+//                System.out.println(account.getInformation().getCredentials().getEmail());
+//                final JFrame parent = new JFrame();
+//                String password = JOptionPane.showInputDialog(parent,
+//                        "Please input the password!", null);
+//                if(password.equals(account.getInformation().getCredentials().getPassword())){
+//                    Object[] charList = new Object[account.getCharacters().size()];
+//
+//                    for(int i = 0; i < account.getCharacters().size(); i++){
+//                        charList[i] = i + " " + account.getCharacters().get(i).getName();
+//                    }
+//                    JFrame charFrame = new JFrame();
+//                    String character = (String) JOptionPane.showInputDialog(
+//                            charFrame,
+//                            "Choose a character!",
+//                            "Character input",
+//                            JOptionPane.PLAIN_MESSAGE,
+//                            null,
+//                            charList,
+//                            "Pick one"
+//                    );
+//                    StringTokenizer token = new StringTokenizer(character);
+//                    int charIndex = Integer.parseInt(token.nextToken());
+//
+//                    JTextField widthField = new JTextField(5);
+//                    JTextField heightField = new JTextField(5);
+//
+//                    JPanel dimensions = new JPanel();
+//                    dimensions.add(new JLabel("Width: "));
+//                    dimensions.add(widthField);
+//                    dimensions.add(new JLabel("Height: "));
+//                    dimensions.add(heightField);
+//
+//                    int gridWidth = 0;
+//                    int gridHeight = 0;
+//
+//                    while(gridHeight * gridWidth < 8){
+//                        int res = JOptionPane.showConfirmDialog(
+//                                null,
+//                                dimensions,
+//                                "Grid dim's: WxH > 7!",
+//                                JOptionPane.OK_CANCEL_OPTION
+//                        );
+//
+//                        if(res == JOptionPane.CANCEL_OPTION){
+//                            System.exit(0);
+//                        }
+//
+//                        gridWidth = Integer.parseInt(widthField.getText());
+//                        gridHeight = Integer.parseInt(heightField.getText());
+//                        System.out.println("Width: " + gridWidth + "; height: " + gridHeight);
+//                    }
+//
+//                    new GameBoardFrame(gridWidth, gridHeight, account.getCharacters().get(charIndex), stories);
+//                    dispose();
+//                }
+//                else{
+//                    System.out.println("Wrong password! Try again");
+//                    panel3.setVisible(true);
+//                }
+//            }
         }
     }
 
