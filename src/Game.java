@@ -155,12 +155,12 @@ public class Game {
             Shop shop = (Shop) grid.getCurrentCell().getObj();
             Character character = grid.getCharacter();
 
-            shop.lookAround();
+            shop.lookAround(false);
             System.out.println("Do you still want to buy anything? (Y/n) ");
             character.buyPotion(shop.removePotion(shop.getHealthPotionIndex()));
             System.out.println("Bought health potion!");
 
-            shop.lookAround();
+            shop.lookAround(false);
             System.out.println("Do you still want to buy anything? (Y/n) ");
             character.buyPotion(shop.removePotion(shop.getManaPotionIndex()));
             System.out.println("Bought mana potion!");
@@ -423,7 +423,7 @@ public class Game {
             if(!keyboard.nextLine().equals("n")){
                 Shop shop = (Shop) grid.getCurrentCell().getObj();
                 Character character = grid.getCharacter();
-                shop.lookAround();
+                shop.lookAround(false);
                 System.out.print("Do you still want to buy anything? (Y/n) ");
                 while(!keyboard.nextLine().equals("n")){
                     System.out.print("Choose the potion index: ");
@@ -435,7 +435,7 @@ public class Game {
                         break;
                     }
 
-                    shop.lookAround();
+                    shop.lookAround(false);
                     System.out.print("Do you still want to buy anything? (Y/n) ");
                     keyboard.nextLine();
                 }

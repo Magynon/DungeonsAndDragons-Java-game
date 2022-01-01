@@ -4,27 +4,37 @@ import characters.Character;
 import characters.Enemy;
 import grid.Cell;
 import grid.Grid;
+import shop.Potion;
 import shop.Shop;
 import spells.Spell;
 
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
 import java.awt.*;
-import java.awt.image.BufferedImage;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.*;
 import java.util.List;
 
-public class GameBoardFrame extends JFrame{
+public class GameBoardFrame extends JFrame implements ActionListener {
     private final int gridWidth;
     private final int gridHeight;
     private final characters.Character character;
     private boolean won = false, notDead = true;
     private final Map<Cell.CellType, List<String>> stories;
     private Scanner keyboard;
-    private JLabel charStats, enemyStats;
-    private JPanel GUIGrid, storyScreen;
+    private JLabel charStats, enemyStats, inventoryStatus;
+    private JPanel GUIGrid;
     private List<JLabel> labelList;
-    private JTextArea storyField;
+    private JTextArea storyField, shoppingCart;
+    private Grid grid;
+    private final JButton up;
+    private final JButton down;
+    private final JButton right;
+    private final JButton left;
+    private JButton addToCart;
+    private JButton removeFromCart;
+    private JList<String> potionJList, potionInventoryJList;
+    private List<Integer> shoppingCartIndexList;
 
     public GameBoardFrame(int gridWidth, int gridHeight, characters.Character character, Map<Cell.CellType, List<String>> stories){
         super("World Of Marcel");
@@ -70,7 +80,7 @@ public class GameBoardFrame extends JFrame{
         add(GUIGrid);
 
         JPanel controls = new JPanel();
-        controls.setMaximumSize(new Dimension((int) (width/1.3), (int) (height/4)));
+        controls.setMaximumSize(new Dimension((int) (width/1.3), height/4));
 
         // story label
         JPanel storyPlace = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -87,17 +97,21 @@ public class GameBoardFrame extends JFrame{
 
         // buttons
         JPanel buttonsContainer = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        buttonsContainer.setMaximumSize(new Dimension((int) (width/4), (int) (height/5)));
+        buttonsContainer.setMaximumSize(new Dimension(width/4, height/5));
         JPanel buttons = new JPanel(new GridLayout(3,3));
 
         Icon icon = new ImageIcon("/home/magy/IdeaProjects/WorldOfMarcel/res/angle-up.png");
-        JButton up = new JButton(icon);
+        up = new JButton(icon);
+        up.addActionListener(this);
         icon = new ImageIcon("/home/magy/IdeaProjects/WorldOfMarcel/res/angle-down.png");
-        JButton down = new JButton(icon);
+        down = new JButton(icon);
+        down.addActionListener(this);
         icon = new ImageIcon("/home/magy/IdeaProjects/WorldOfMarcel/res/angle-left.png");
-        JButton left = new JButton(icon);
+        left = new JButton(icon);
+        left.addActionListener(this);
         icon = new ImageIcon("/home/magy/IdeaProjects/WorldOfMarcel/res/angle-right.png");
-        JButton right = new JButton(icon);
+        right = new JButton(icon);
+        right.addActionListener(this);
 
         buttons.add(new JLabel());
         buttons.add(up);
@@ -122,10 +136,10 @@ public class GameBoardFrame extends JFrame{
     }
     public void runGUI(){
         // start game with account
-        Grid grid = Grid.getInstance();
+        grid = Grid.getInstance();
         grid = grid.genMap(gridWidth, gridHeight, character);
         initLabelList();
-        updateGrid(grid);
+        updateGrid();
 
         System.out.println(grid.showAllGrid());
         System.out.println(grid);
@@ -149,7 +163,7 @@ public class GameBoardFrame extends JFrame{
         }
     }
 
-    private void updateGrid(Grid grid){
+    private void updateGrid(){
         int length = stories.get(grid.getCurrentCell().getType()).size();
         int index = new Random().nextInt(length);
         storyField.setText(stories.get(grid.getCurrentCell().getType()).get(index));
@@ -162,7 +176,7 @@ public class GameBoardFrame extends JFrame{
                     char character = grid.get(i).get(j).getObj().toCharacter();
 
                     if(grid.getCurrentCell().getOx() == j && grid.getCurrentCell().getOy() == i){
-                        current.setBackground(Color.red);
+                        current.setBackground(Color.PINK);
                         current.setOpaque(true);
                     }
 
@@ -173,7 +187,7 @@ public class GameBoardFrame extends JFrame{
                         case 'E' -> {
                             icon = new ImageIcon("/home/magy/IdeaProjects/WorldOfMarcel/res/angry.png");
                             Image image = icon.getImage();
-                            Image newImage = image.getScaledInstance(100, 100,  Image.SCALE_DEFAULT);
+                            Image newImage = image.getScaledInstance(50, 50,  Image.SCALE_DEFAULT);
                             icon = new ImageIcon(newImage);
                             current.setIcon(icon);
                             //Image newImage = fitimage(image, 200, 200);
@@ -181,10 +195,16 @@ public class GameBoardFrame extends JFrame{
                         }
                         case 'S' -> {
                             icon = new ImageIcon("/home/magy/IdeaProjects/WorldOfMarcel/res/store.png");
+                            Image image = icon.getImage();
+                            Image newImage = image.getScaledInstance(50, 50,  Image.SCALE_DEFAULT);
+                            icon = new ImageIcon(newImage);
                             current.setIcon(icon);
                         }
                         case 'F' -> {
                             icon = new ImageIcon("/home/magy/IdeaProjects/WorldOfMarcel/res/check.png");
+                            Image image = icon.getImage();
+                            Image newImage = image.getScaledInstance(50, 50,  Image.SCALE_DEFAULT);
+                            icon = new ImageIcon(newImage);
                             current.setIcon(icon);
                         }
                     }
@@ -202,6 +222,8 @@ public class GameBoardFrame extends JFrame{
             }
         }
         GUIGrid.removeAll();
+        GUIGrid.revalidate();
+        GUIGrid.repaint();
         for(JLabel label : labelList){
             GUIGrid.add(label);
         }
@@ -217,23 +239,7 @@ public class GameBoardFrame extends JFrame{
     private void showStory(Cell element){
         int length = stories.get(element.getType()).size();
         int index = new Random().nextInt(length);
-        System.out.println(stories.get(element.getType()).get(index));
-    }
-
-    public void nextMove(String direction, Grid grid) {
-        boolean goodMove = false;
-        switch (direction) {
-            case "N" -> goodMove = grid.goNorth();
-            case "S" -> goodMove = grid.goSouth();
-            case "E" -> goodMove = grid.goEast();
-            case "W" -> goodMove = grid.goWest();
-        }
-        if(goodMove){
-            currentCellAction(grid);
-        }
-        else{
-            System.out.println("Wrong move, try again!");
-        }
+        storyField.setText(stories.get(element.getType()).get(index));
     }
 
     public void currentCellAction(Grid grid) {
@@ -244,34 +250,88 @@ public class GameBoardFrame extends JFrame{
         }
 
         if(grid.getCurrentCell().getObj().toCharacter() == 'F'){
-            System.out.println("Congratulations, you won!");
             won = true;
+            System.exit(0);
         }
 
         if(grid.getCurrentCell().getObj().toCharacter() == 'S'){
             showStory(grid.getCurrentCell());
-            System.out.print("Should you desire to take a look around the shop? (Y/n) ");
+            Shop shop = (Shop) grid.getCurrentCell().getObj();
+            List<Potion> potionList = shop.lookAround(true);
 
-            if(!keyboard.nextLine().equals("n")){
-                Shop shop = (Shop) grid.getCurrentCell().getObj();
-                Character character = grid.getCharacter();
-                shop.lookAround();
-                System.out.print("Do you still want to buy anything? (Y/n) ");
-                while(!keyboard.nextLine().equals("n")){
-                    System.out.print("Choose the potion index: ");
-                    int index = keyboard.nextInt() - 1;
+            shoppingCartIndexList = new ArrayList<>();
+
+            JPanel shoppingPanel = new JPanel();
+            shoppingPanel.setLayout(new BoxLayout(shoppingPanel, BoxLayout.Y_AXIS));
+
+            JPanel inventoryStatusPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+            inventoryStatus = new JLabel();
+            inventoryStatus.setText("Coins: " + character.getInventory().getCoinNumber() +
+                    ", max weight: " + character.getInventory().getMaxWeight() +
+                    ", current weight: " + character.getInventory().getCurrentWeight());
+            inventoryStatusPanel.add(inventoryStatus);
+            shoppingPanel.add(inventoryStatusPanel);
+
+            DefaultListModel<String> arrShop = new DefaultListModel<>();
+            for(int i = 0; i < potionList.size(); i++){
+                arrShop.add(i, potionList.get(i).toString());
+            }
+            potionJList = new JList<>(arrShop);
+            potionJList.setLayoutOrientation(JList.VERTICAL);
+            potionJList.setFont(new Font("Arial", Font.BOLD, 15));
+            JScrollPane scrollPaneShop = new JScrollPane();
+            scrollPaneShop.setViewportView(potionJList);
+            scrollPaneShop.setPreferredSize(new Dimension(500, 100));
+            shoppingPanel.add(scrollPaneShop);
+
+            shoppingPanel.add(Box.createRigidArea(new Dimension(500, 15)));
+
+            JPanel addToCartPanel = new JPanel();
+            addToCart = new JButton("Add to cart!");
+            addToCart.addActionListener(this);
+            addToCartPanel.add(addToCart);
+            shoppingPanel.add(addToCartPanel);
+
+            shoppingPanel.add(Box.createRigidArea(new Dimension(500, 20)));
+
+            JPanel inventorySetup = new JPanel();
+
+            JPanel inventoryList = new JPanel(new FlowLayout(FlowLayout.LEFT));
+            JPanel removeButton = new JPanel(new FlowLayout(FlowLayout.CENTER));
+
+            DefaultListModel<String> arrInventory = new DefaultListModel<>();
+            potionInventoryJList = new JList<>(arrInventory);
+            potionInventoryJList.setLayoutOrientation(JList.VERTICAL);
+            potionInventoryJList.setFont(new Font("Arial", Font.BOLD, 15));
+            JScrollPane scrollPaneInventory = new JScrollPane();
+            scrollPaneInventory.setViewportView(potionInventoryJList);
+            inventoryList.add(scrollPaneInventory);
+
+            removeFromCart = new JButton("X");
+            removeFromCart.addActionListener(this);
+            removeFromCart.setBackground(Color.red);
+            removeFromCart.setForeground(Color.white);
+            removeButton.add(removeFromCart);
+
+            inventorySetup.add(inventoryList);
+            inventorySetup.add(removeButton);
+
+            shoppingPanel.add(inventorySetup);
+
+            int res = JOptionPane.showConfirmDialog(
+                            null,
+                            shoppingPanel,
+                            "Potion shopping",
+                            JOptionPane.OK_CANCEL_OPTION
+            );
+
+            if(res == JOptionPane.OK_OPTION){
+                for(int index : shoppingCartIndexList){
                     character.buyPotion(shop.removePotion(index));
-                    System.out.println("Bought potion " + (index+1) + "!");
-
-                    if(shop.isEmpty()){
-                        break;
-                    }
-
-                    shop.lookAround();
-                    System.out.print("Do you still want to buy anything? (Y/n) ");
-                    keyboard.nextLine();
                 }
-                System.out.println("Exited store!\n");
+            }
+            else{
+                storyField.setText("Exited store!\n");
             }
         }
 
@@ -284,13 +344,8 @@ public class GameBoardFrame extends JFrame{
                 boolean actionDone = false;
 
                 while(!actionDone){
-                    System.out.println("lnYOUR TURN! -------------------------------");
-                    System.out.println("STATS:");
-                    System.out.print("\tYOU: ");
-                    System.out.println("life = " + character.getCurrentLife() + " mana = " + character.getCurrentMana());
-                    System.out.print("\tENEMY: ");
-                    System.out.println("life = " + enemy.getCurrentLife() + " mana = " + enemy.getCurrentMana());
-                    System.out.println("""
+                    storyField.setText("YOUR TURN! -------------------------------");
+                    storyField.setText("""
                             There are 3 options:
                             \t1. attack!
                             \t2. use ability!
@@ -305,7 +360,7 @@ public class GameBoardFrame extends JFrame{
                         case 1 -> {
                             Spell spell = character.getSpell();
                             if(spell == null){
-                                System.out.println("No spells left! Try attacking or a potion.");
+                                storyField.setText("No spells left! Try attacking or a potion.");
                                 break;
                             }
                             if(spell.getMana() <= character.getCurrentMana()){
@@ -315,50 +370,45 @@ public class GameBoardFrame extends JFrame{
                         }
                         case 2 -> {
                             if(character.getInventory().getPotionNumber() == 0){
-                                System.out.println("No potions available!");
+                                storyField.setText("No potions available!");
                             }
                             else{
                                 character.getInventory().showPotions();
                                 System.out.print("Choose potion: ");
                                 int potionIndex = keyboard.nextInt() - 1;
-                                System.out.println("Chose " + character.getInventory().getPotion(potionIndex));
+                                storyField.setText("Chose " + character.getInventory().getPotion(potionIndex));
                                 character.usePotion(potionIndex);
                                 actionDone = true;
                             }
                         }
-                        default -> System.out.println("Invalid choice, try again!");
+                        default -> storyField.setText("Invalid choice, try again!");
                     }
                 }
 
                 // enemy's turn
                 if(enemy.getCurrentLife() > 0){
-                    System.out.println("\nENEMY's TURN! -------------------------------");
-                    System.out.println("STATS:");
-                    System.out.print("\tYOU: ");
-                    System.out.println("life = " + character.getCurrentLife() + " mana = " + character.getCurrentMana());
-                    System.out.print("\tENEMY: ");
-                    System.out.println("life = " + enemy.getCurrentLife() + " mana = " + enemy.getCurrentMana());
+                    storyField.setText("\nENEMY's TURN! -------------------------------");
 
                     int chance = new Random().nextInt(4);
                     if(chance == 0){
                         Spell spell = enemy.getSpell();
                         if(spell == null){
-                            System.out.println("Enemy attacked you!");
+                            storyField.setText("Enemy attacked you!");
                             character.receiveDamage(enemy.getDamage());
                         }
                         else{
                             enemy.useAbility(spell, character);
                             if(enemy.getCurrentMana() < spell.getMana()){
-                                System.out.println("Enemy attacked you!");
+                                storyField.setText("Enemy attacked you!");
                                 character.receiveDamage(enemy.getDamage());
                             }
                             else{
-                                System.out.println("Enemy put a spell on you!");
+                                storyField.setText("Enemy put a spell on you!");
                             }
                         }
                     }
                     else{
-                        System.out.println("Enemy attacked you!");
+                        storyField.setText("Enemy attacked you!");
                         character.receiveDamage(enemy.getDamage());
                     }
                 }
@@ -366,15 +416,103 @@ public class GameBoardFrame extends JFrame{
             if(enemy.getCurrentLife() <= 0){
                 int earnedCoins = enemy.onDeathReturnCoins();
                 character.getInventory().earnCoins(earnedCoins);
-                System.out.println("Congratulations, the enemy was defeated" +
+                storyField.setText("Congratulations, the enemy was defeated" +
                         " and you won " + earnedCoins + " coins!");
+
                 character.newEnemyDefeated();
             }
             else{
-                System.out.println("You have been defeated. The future is black.");
+                storyField.setText("You have been defeated. The future is black.");
                 notDead = false;
             }
             keyboard.nextLine();
+        }
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        boolean goodMove = false;
+
+        Object source = e.getSource();
+        if (up.equals(source)) {
+            goodMove = grid.goNorth();
+        } else if (down.equals(source)) {
+            goodMove = grid.goSouth();
+        } else if (left.equals(source)) {
+            goodMove = grid.goWest();
+        } else if (right.equals(source)) {
+            goodMove = grid.goEast();
+        } else if (addToCart.equals(source)){
+            if(potionJList.isSelectionEmpty())
+                return;
+            DefaultListModel<String> modelShop = (DefaultListModel<String>) potionJList.getModel();
+            shoppingCartIndexList.add(potionJList.getSelectedIndex());
+
+            DefaultListModel<String> modelInventory = (DefaultListModel<String>) potionInventoryJList.getModel();
+            modelInventory.add(modelInventory.size(), potionJList.getSelectedValue());
+
+            int coins = character.getInventory().getCoinNumber();
+            int weight = character.getInventory().getCurrentWeight();
+
+            for(int i = 0; i < modelInventory.size(); i++){
+                String potion = modelInventory.get(i);
+                StringTokenizer tokenizer = new StringTokenizer(potion);
+                tokenizer.nextToken(", ");
+                tokenizer.nextToken(", ");
+                weight += Integer.parseInt(tokenizer.nextToken(", "));
+                tokenizer.nextToken(", ");
+                coins -= Integer.parseInt(tokenizer.nextToken(", "));
+            }
+
+            addToCart.setEnabled(coins > 0 && weight < character.getInventory().getMaxWeight());
+
+            inventoryStatus.removeAll();
+            inventoryStatus.setText("Coins: " + coins +
+                    ", max weight: " + character.getInventory().getMaxWeight() +
+                    ", current weight: " + weight);
+
+            modelShop.removeElementAt(potionJList.getSelectedIndex());
+            potionJList.repaint();
+        } else if (removeFromCart.equals(source)){
+            if(potionJList.isSelectionEmpty())
+                return;
+            DefaultListModel<String> modelShop = (DefaultListModel<String>) potionJList.getModel();
+            shoppingCartIndexList.remove(potionInventoryJList.getSelectedIndex());
+
+            DefaultListModel<String> modelInventory = (DefaultListModel<String>) potionInventoryJList.getModel();
+            modelShop.add(modelShop.size(), potionInventoryJList.getSelectedValue());
+
+            int coins = character.getInventory().getCoinNumber();
+            int weight = character.getInventory().getCurrentWeight();
+
+            for(int i = 0; i < modelInventory.size(); i++){
+                String potion = modelInventory.get(i);
+                StringTokenizer tokenizer = new StringTokenizer(potion);
+                tokenizer.nextToken(", ");
+                tokenizer.nextToken(", ");
+                weight += Integer.parseInt(tokenizer.nextToken(", "));
+                tokenizer.nextToken(", ");
+                coins -= Integer.parseInt(tokenizer.nextToken(", "));
+            }
+
+            addToCart.setEnabled(coins > 0 && weight < character.getInventory().getMaxWeight());
+
+            inventoryStatus.removeAll();
+            inventoryStatus.setText("Coins: " + coins +
+                    ", max weight: " + character.getInventory().getMaxWeight() +
+                    ", current weight: " + weight);
+
+            modelInventory.removeElementAt(potionJList.getSelectedIndex());
+            potionJList.repaint();
+        }
+        if(goodMove){
+            updateGrid();
+            currentCellAction(grid);
+            updateStats();
+        }
+        else{
+            if(grid.getCurrentCell().getType() != Cell.CellType.SHOP)
+                storyField.setText("Wrong move, try again!");
         }
     }
 }

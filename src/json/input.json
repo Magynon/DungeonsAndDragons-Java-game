@@ -63,5 +63,12 @@
         "It seems the traveler has things to buy."
       ]
     }
+    ,
+    {
+      "type": "F",
+      "storyArr": [
+        "Congratulations, you won!"
+      ]
+    }
   ]
 }

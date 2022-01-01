@@ -30,10 +30,16 @@ public class Shop implements CellElement {
         return potionList.remove(index);
     }
 
-    public void lookAround(){
-        System.out.println("This shop has:");
-        for(int i = 0; i < potionList.size(); i++){
-            System.out.println("\t" + (i+1) + " " + potionList.get(i));
+    public List<Potion> lookAround(boolean gui){
+        if(gui){
+            return potionList;
+        }
+        else{
+            System.out.println("This shop has:");
+            for(int i = 0; i < potionList.size(); i++){
+                System.out.println("\t" + (i+1) + " " + potionList.get(i));
+            }
+            return null;
         }
     }
 

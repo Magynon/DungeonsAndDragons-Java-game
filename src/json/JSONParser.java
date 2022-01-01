@@ -89,6 +89,7 @@ public class JSONParser {
                 case "N" -> this.stories.put(Cell.CellType.EMPTY, cellStories);
                 case "S" -> this.stories.put(Cell.CellType.SHOP, cellStories);
                 case "E" -> this.stories.put(Cell.CellType.ENEMY, cellStories);
+                case "F" -> this.stories.put(Cell.CellType.FINISH, cellStories);
             }
         }
     }

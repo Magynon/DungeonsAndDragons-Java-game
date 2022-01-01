@@ -44,6 +44,18 @@ public class Inventory {
         return potionList.size();
     }
 
+    public int getCurrentWeight() {
+        return currentWeight;
+    }
+
+    public int getMaxWeight() {
+        return maxWeight;
+    }
+
+    public int getCoinNumber() {
+        return coinNumber;
+    }
+
     public Potion getPotion(int index){
         return potionList.get(index);
     }
