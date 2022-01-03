@@ -32,7 +32,6 @@ public class GameBoardFrame extends JFrame implements ActionListener {
     private final JButton right;
     private final JButton left;
     private JButton addToCart;
-    private JButton removeFromCart;
     private JList<String> potionJList, potionInventoryJList;
     private List<Integer> shoppingCartIndexList;
 
@@ -289,15 +288,12 @@ public class GameBoardFrame extends JFrame implements ActionListener {
             JPanel addToCartPanel = new JPanel();
             addToCart = new JButton("Add to cart!");
             addToCart.addActionListener(this);
+            addToCart.setEnabled(character.getInventory().getCoinNumber() > 0 &&
+                    character.getInventory().getCurrentWeight() < character.getInventory().getMaxWeight());
             addToCartPanel.add(addToCart);
             shoppingPanel.add(addToCartPanel);
 
             shoppingPanel.add(Box.createRigidArea(new Dimension(500, 20)));
-
-            JPanel inventorySetup = new JPanel();
-
-            JPanel inventoryList = new JPanel(new FlowLayout(FlowLayout.LEFT));
-            JPanel removeButton = new JPanel(new FlowLayout(FlowLayout.CENTER));
 
             DefaultListModel<String> arrInventory = new DefaultListModel<>();
             potionInventoryJList = new JList<>(arrInventory);
@@ -305,18 +301,8 @@ public class GameBoardFrame extends JFrame implements ActionListener {
             potionInventoryJList.setFont(new Font("Arial", Font.BOLD, 15));
             JScrollPane scrollPaneInventory = new JScrollPane();
             scrollPaneInventory.setViewportView(potionInventoryJList);
-            inventoryList.add(scrollPaneInventory);
 
-            removeFromCart = new JButton("X");
-            removeFromCart.addActionListener(this);
-            removeFromCart.setBackground(Color.red);
-            removeFromCart.setForeground(Color.white);
-            removeButton.add(removeFromCart);
-
-            inventorySetup.add(inventoryList);
-            inventorySetup.add(removeButton);
-
-            shoppingPanel.add(inventorySetup);
+            shoppingPanel.add(scrollPaneInventory);
 
             int res = JOptionPane.showConfirmDialog(
                             null,
@@ -445,18 +431,24 @@ public class GameBoardFrame extends JFrame implements ActionListener {
         } else if (addToCart.equals(source)){
             if(potionJList.isSelectionEmpty())
                 return;
+
             DefaultListModel<String> modelShop = (DefaultListModel<String>) potionJList.getModel();
-            shoppingCartIndexList.add(potionJList.getSelectedIndex());
-
             DefaultListModel<String> modelInventory = (DefaultListModel<String>) potionInventoryJList.getModel();
-            modelInventory.add(modelInventory.size(), potionJList.getSelectedValue());
 
+            String potionToAdd = potionJList.getSelectedValue();
             int coins = character.getInventory().getCoinNumber();
             int weight = character.getInventory().getCurrentWeight();
 
+            StringTokenizer tokenizer = new StringTokenizer(potionToAdd);
+            tokenizer.nextToken(", ");
+            tokenizer.nextToken(", ");
+            weight += Integer.parseInt(tokenizer.nextToken(", "));
+            tokenizer.nextToken(", ");
+            coins -= Integer.parseInt(tokenizer.nextToken(", "));
+
             for(int i = 0; i < modelInventory.size(); i++){
                 String potion = modelInventory.get(i);
-                StringTokenizer tokenizer = new StringTokenizer(potion);
+                tokenizer = new StringTokenizer(potion);
                 tokenizer.nextToken(", ");
                 tokenizer.nextToken(", ");
                 weight += Integer.parseInt(tokenizer.nextToken(", "));
@@ -464,46 +456,18 @@ public class GameBoardFrame extends JFrame implements ActionListener {
                 coins -= Integer.parseInt(tokenizer.nextToken(", "));
             }
 
-            addToCart.setEnabled(coins > 0 && weight < character.getInventory().getMaxWeight());
-
-            inventoryStatus.removeAll();
-            inventoryStatus.setText("Coins: " + coins +
-                    ", max weight: " + character.getInventory().getMaxWeight() +
-                    ", current weight: " + weight);
-
-            modelShop.removeElementAt(potionJList.getSelectedIndex());
-            potionJList.repaint();
-        } else if (removeFromCart.equals(source)){
-            if(potionJList.isSelectionEmpty())
-                return;
-            DefaultListModel<String> modelShop = (DefaultListModel<String>) potionJList.getModel();
-            shoppingCartIndexList.remove(potionInventoryJList.getSelectedIndex());
-
-            DefaultListModel<String> modelInventory = (DefaultListModel<String>) potionInventoryJList.getModel();
-            modelShop.add(modelShop.size(), potionInventoryJList.getSelectedValue());
-
-            int coins = character.getInventory().getCoinNumber();
-            int weight = character.getInventory().getCurrentWeight();
-
-            for(int i = 0; i < modelInventory.size(); i++){
-                String potion = modelInventory.get(i);
-                StringTokenizer tokenizer = new StringTokenizer(potion);
-                tokenizer.nextToken(", ");
-                tokenizer.nextToken(", ");
-                weight += Integer.parseInt(tokenizer.nextToken(", "));
-                tokenizer.nextToken(", ");
-                coins -= Integer.parseInt(tokenizer.nextToken(", "));
+            if(coins >= 0 && weight <= character.getInventory().getMaxWeight()){
+                shoppingCartIndexList.add(potionJList.getSelectedIndex());
+                modelInventory.add(modelInventory.size(), potionJList.getSelectedValue());
+                inventoryStatus.removeAll();
+                inventoryStatus.setText("Coins: " + coins +
+                        ", max weight: " + character.getInventory().getMaxWeight() +
+                        ", current weight: " + weight);
+                modelShop.removeElementAt(potionJList.getSelectedIndex());
+                potionJList.repaint();
             }
 
             addToCart.setEnabled(coins > 0 && weight < character.getInventory().getMaxWeight());
-
-            inventoryStatus.removeAll();
-            inventoryStatus.setText("Coins: " + coins +
-                    ", max weight: " + character.getInventory().getMaxWeight() +
-                    ", current weight: " + weight);
-
-            modelInventory.removeElementAt(potionJList.getSelectedIndex());
-            potionJList.repaint();
         }
         if(goodMove){
             updateGrid();

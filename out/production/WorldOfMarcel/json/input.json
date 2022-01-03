@@ -1,0 +1,74 @@
+{
+  "accounts": [
+
+    {
+      "country": "Romania",
+      "email": "stefanmagirescu@yahoo.com",
+      "password": "christmas",
+      "favGames": [
+        "slenderman", "minecraft"
+      ],
+      "name": "Stefan Magirescu",
+      "characters": [
+        "Rogue", "Warrior"
+      ]
+    },
+
+    {
+      "country": "Great Britain",
+      "email": "johnsmith@yahoo.com",
+      "password": "stranger",
+      "favGames": [
+        "blueWhale", "deepWeb"
+      ],
+      "name": "John Smith",
+      "characters": [
+        "Mage", "Rogue"
+      ]
+    },
+
+    {
+      "country": "Great Britain",
+      "email": "a",
+      "password": "a",
+      "favGames": [
+        "blueWhale", "deepWeb"
+      ],
+      "name": "Test Account",
+      "characters": [
+        "Mage", "Rogue"
+      ]
+    }
+
+  ],
+  "stories": [
+    {
+      "type": "N",
+      "storyArr": [
+        "The traveler has stepped on nobody's land.",
+        "The traveler lives to see another day."
+      ]
+    },
+    {
+      "type": "E",
+      "storyArr": [
+        "Get ready to face the enemy!",
+        "Let the fight begin!"
+      ]
+    },
+    {
+      "type": "S",
+      "storyArr": [
+        "The traveler has come across a shop. Choose your investment wisely.",
+        "It seems the traveler has things to buy."
+      ]
+    }
+    ,
+    {
+      "type": "F",
+      "storyArr": [
+        "Congratulations, you won!"
+      ]
+    }
+  ]
+}
