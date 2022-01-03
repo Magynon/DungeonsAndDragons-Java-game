@@ -21,7 +21,6 @@ public class GameBoardFrame extends JFrame implements ActionListener {
     private final characters.Character character;
     private boolean won = false, notDead = true;
     private final Map<Cell.CellType, List<String>> stories;
-    private Scanner keyboard;
     private JLabel charStats, enemyStats, inventoryStatus;
     private JPanel GUIGrid;
     private List<JLabel> labelList;
@@ -31,7 +30,7 @@ public class GameBoardFrame extends JFrame implements ActionListener {
     private final JButton down;
     private final JButton right;
     private final JButton left;
-    private JButton addToCart;
+    private JButton addToCart, attack, ability, potion;
     private JList<String> potionJList, potionInventoryJList;
     private List<Integer> shoppingCartIndexList;
 
@@ -59,6 +58,7 @@ public class GameBoardFrame extends JFrame implements ActionListener {
         JPanel charStatsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         charStats = new JLabel();
         charStats.setFont(new Font("Serif", Font.BOLD, 18));
+        charStats.setText("<html>Your life: " + character.getCurrentLife() + "<br>Your mana: " + character.getCurrentMana() + "</html>");
         charStatsPanel.add(charStats);
 
         JPanel enemyStatsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
@@ -66,8 +66,6 @@ public class GameBoardFrame extends JFrame implements ActionListener {
         enemyStats.setHorizontalAlignment(SwingConstants.RIGHT);
         enemyStats.setFont(new Font("Serif", Font.BOLD, 18));
         enemyStatsPanel.add(enemyStats);
-
-        updateStats();
 
         stats.add(charStatsPanel);
         stats.add(enemyStatsPanel);
@@ -229,10 +227,23 @@ public class GameBoardFrame extends JFrame implements ActionListener {
     }
 
     private void updateStats(){
+        Enemy enemy = (Enemy) grid.getCurrentCell().getObj();
         charStats.removeAll();
         enemyStats.removeAll();
-        charStats.setText("<html>Your life: " + character.getCurrentLife() + "<br>Your mana: " + character.getCurrentMana() + "</html>");
-        enemyStats.setText("<html><p style=\"text-align:right;\">" + character.getCurrentLife() + " :enemy's life</p>" + character.getCurrentMana() + " :enemy's mana</html>");
+        if(character.getCurrentLife() > 0){
+            charStats.setText("<html>Your life: " + character.getCurrentLife() + "<br>Your mana: " + character.getCurrentMana() + "</html>");
+        }
+        else{
+            enemyStats.setText("");
+            charStats.setText("");
+            return;
+        }
+        if(enemy.getCurrentLife() > 0){
+            enemyStats.setText("<html><p style=\"text-align:right;\">" + enemy.getCurrentLife() + " :enemy's life</p>" + enemy.getCurrentMana() + " :enemy's mana</html>");
+        }
+        else{
+            enemyStats.setText("");
+        }
     }
 
     private void showStory(Cell element){
@@ -327,97 +338,94 @@ public class GameBoardFrame extends JFrame implements ActionListener {
 
             showStory(grid.getCurrentCell());
             while(enemy.getCurrentLife() > 0 && character.getCurrentLife() > 0){
-                boolean actionDone = false;
-
-                while(!actionDone){
-                    storyField.setText("YOUR TURN! -------------------------------");
-                    storyField.setText("""
+                storyField.setText("YOUR TURN! -------------------------------");
+                storyField.setText("""
                             There are 3 options:
                             \t1. attack!
                             \t2. use ability!
                             \t3. use potion!""");
-                    System.out.print("Choose your move: ");
-                    int index = keyboard.nextInt() - 1;
-                    switch (index) {
-                        case 0 -> {
-                            enemy.receiveDamage(character.getDamage());
-                            actionDone = true;
-                        }
-                        case 1 -> {
-                            Spell spell = character.getSpell();
-                            if(spell == null){
-                                storyField.setText("No spells left! Try attacking or a potion.");
-                                break;
-                            }
-                            if(spell.getMana() <= character.getCurrentMana()){
-                                actionDone = true;
-                            }
-                            character.useAbility(spell, enemy);
-                        }
-                        case 2 -> {
-                            if(character.getInventory().getPotionNumber() == 0){
-                                storyField.setText("No potions available!");
-                            }
-                            else{
-                                character.getInventory().showPotions();
-                                System.out.print("Choose potion: ");
-                                int potionIndex = keyboard.nextInt() - 1;
-                                storyField.setText("Chose " + character.getInventory().getPotion(potionIndex));
-                                character.usePotion(potionIndex);
-                                actionDone = true;
-                            }
-                        }
-                        default -> storyField.setText("Invalid choice, try again!");
-                    }
-                }
+                System.out.print("Choose your move: ");
+
+                JPanel combatChoices = new JPanel();
+                attack = new JButton("Attack!");
+                ability = new JButton("Ability!");
+                potion = new JButton("Potion!");
+
+                attack.addActionListener(this);
+                ability.addActionListener(this);
+                potion.addActionListener(this);
+
+                combatChoices.add(attack);
+                combatChoices.add(ability);
+                combatChoices.add(potion);
+
+                JOptionPane.showOptionDialog(
+                        null,
+                        combatChoices,
+                        "Choose how to combat!",
+                        JOptionPane.DEFAULT_OPTION,
+                        JOptionPane.INFORMATION_MESSAGE,
+                        null, new Object[]{}, null
+                );
 
                 // enemy's turn
                 if(enemy.getCurrentLife() > 0){
-                    storyField.setText("\nENEMY's TURN! -------------------------------");
-
+                    storyField.removeAll();
                     int chance = new Random().nextInt(4);
                     if(chance == 0){
                         Spell spell = enemy.getSpell();
                         if(spell == null){
-                            storyField.setText("Enemy attacked you!");
+                            storyField.setText("""
+                                    ENEMY's TURN! -------------------------------
+                                    Enemy attacked you!""");
                             character.receiveDamage(enemy.getDamage());
+                            updateStats();
                         }
                         else{
                             enemy.useAbility(spell, character);
                             if(enemy.getCurrentMana() < spell.getMana()){
-                                storyField.setText("Enemy attacked you!");
+                                storyField.setText("""
+                                        ENEMY's TURN! -------------------------------
+                                        Enemy attacked you!""");
                                 character.receiveDamage(enemy.getDamage());
+                                updateStats();
                             }
                             else{
-                                storyField.setText("Enemy put a spell on you!");
+                                storyField.setText("""
+                                        ENEMY's TURN! -------------------------------
+                                        Enemy put a spell on you!""");
+                                updateStats();
                             }
                         }
                     }
                     else{
-                        storyField.setText("Enemy attacked you!");
+                        storyField.setText("""
+                                ENEMY's TURN! -------------------------------
+                                Enemy attacked you!""");
                         character.receiveDamage(enemy.getDamage());
+                        updateStats();
                     }
                 }
             }
+            storyField.removeAll();
             if(enemy.getCurrentLife() <= 0){
                 int earnedCoins = enemy.onDeathReturnCoins();
                 character.getInventory().earnCoins(earnedCoins);
                 storyField.setText("Congratulations, the enemy was defeated" +
                         " and you won " + earnedCoins + " coins!");
-
                 character.newEnemyDefeated();
             }
             else{
                 storyField.setText("You have been defeated. The future is black.");
                 notDead = false;
             }
-            keyboard.nextLine();
         }
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         boolean goodMove = false;
+        Character character = grid.getCharacter();
 
         Object source = e.getSource();
         if (up.equals(source)) {
@@ -428,54 +436,106 @@ public class GameBoardFrame extends JFrame implements ActionListener {
             goodMove = grid.goWest();
         } else if (right.equals(source)) {
             goodMove = grid.goEast();
-        } else if (addToCart.equals(source)){
-            if(potionJList.isSelectionEmpty())
-                return;
+        } else if (addToCart != null){
+            if(addToCart.equals(source)){
+                if(potionJList.isSelectionEmpty())
+                    return;
 
-            DefaultListModel<String> modelShop = (DefaultListModel<String>) potionJList.getModel();
-            DefaultListModel<String> modelInventory = (DefaultListModel<String>) potionInventoryJList.getModel();
+                DefaultListModel<String> modelShop = (DefaultListModel<String>) potionJList.getModel();
+                DefaultListModel<String> modelInventory = (DefaultListModel<String>) potionInventoryJList.getModel();
 
-            String potionToAdd = potionJList.getSelectedValue();
-            int coins = character.getInventory().getCoinNumber();
-            int weight = character.getInventory().getCurrentWeight();
+                String potionToAdd = potionJList.getSelectedValue();
+                int coins = character.getInventory().getCoinNumber();
+                int weight = character.getInventory().getCurrentWeight();
 
-            StringTokenizer tokenizer = new StringTokenizer(potionToAdd);
-            tokenizer.nextToken(", ");
-            tokenizer.nextToken(", ");
-            weight += Integer.parseInt(tokenizer.nextToken(", "));
-            tokenizer.nextToken(", ");
-            coins -= Integer.parseInt(tokenizer.nextToken(", "));
-
-            for(int i = 0; i < modelInventory.size(); i++){
-                String potion = modelInventory.get(i);
-                tokenizer = new StringTokenizer(potion);
+                StringTokenizer tokenizer = new StringTokenizer(potionToAdd);
                 tokenizer.nextToken(", ");
                 tokenizer.nextToken(", ");
                 weight += Integer.parseInt(tokenizer.nextToken(", "));
                 tokenizer.nextToken(", ");
                 coins -= Integer.parseInt(tokenizer.nextToken(", "));
-            }
 
-            if(coins >= 0 && weight <= character.getInventory().getMaxWeight()){
-                shoppingCartIndexList.add(potionJList.getSelectedIndex());
-                modelInventory.add(modelInventory.size(), potionJList.getSelectedValue());
-                inventoryStatus.removeAll();
-                inventoryStatus.setText("Coins: " + coins +
-                        ", max weight: " + character.getInventory().getMaxWeight() +
-                        ", current weight: " + weight);
-                modelShop.removeElementAt(potionJList.getSelectedIndex());
-                potionJList.repaint();
-            }
+                for(int i = 0; i < modelInventory.size(); i++){
+                    String potion = modelInventory.get(i);
+                    tokenizer = new StringTokenizer(potion);
+                    tokenizer.nextToken(", ");
+                    tokenizer.nextToken(", ");
+                    weight += Integer.parseInt(tokenizer.nextToken(", "));
+                    tokenizer.nextToken(", ");
+                    coins -= Integer.parseInt(tokenizer.nextToken(", "));
+                }
 
-            addToCart.setEnabled(coins > 0 && weight < character.getInventory().getMaxWeight());
+                if(coins >= 0 && weight <= character.getInventory().getMaxWeight()){
+                    shoppingCartIndexList.add(potionJList.getSelectedIndex());
+                    modelInventory.add(modelInventory.size(), potionJList.getSelectedValue());
+                    inventoryStatus.removeAll();
+                    inventoryStatus.setText("Coins: " + coins +
+                            ", max weight: " + character.getInventory().getMaxWeight() +
+                            ", current weight: " + weight);
+                    modelShop.removeElementAt(potionJList.getSelectedIndex());
+                    potionJList.repaint();
+                }
+
+                addToCart.setEnabled(coins > 0 && weight < character.getInventory().getMaxWeight());
+            }
+        } else if(attack.equals(source)){
+            Enemy enemy = (Enemy) grid.getCurrentCell().getObj();
+            enemy.receiveDamage(character.getDamage());
+            System.out.println("You attacked the enemy!");
+            updateStats();
+            JOptionPane.getRootFrame().dispose();
+        } else if(ability.equals(source)){
+            Enemy enemy = (Enemy) grid.getCurrentCell().getObj();
+            Spell spell = character.getSpell();
+            if(spell == null){
+                storyField.setText("No spells left! Try attacking or a potion.");
+            }
+            else{
+                character.useAbility(spell, enemy);
+                updateStats();
+                JOptionPane.getRootFrame().dispose();
+            }
+        } else if(potion.equals(source)){
+            Enemy enemy = (Enemy) grid.getCurrentCell().getObj();
+            if(character.getInventory().getPotionNumber() == 0){
+                storyField.setText("No potions available!");
+            }
+            else{
+                Object[] potionList = new Object[character.getInventory().getPotionNumber()];
+
+                for(int i = 0; i < character.getInventory().getPotionNumber(); i++){
+                    potionList[i] = i + " " + character.getInventory().getPotion(i);
+                }
+
+                String potion = (String) JOptionPane.showInputDialog(
+                        null,
+                        "Choose a potion!",
+                        "Use potion!",
+                        JOptionPane.PLAIN_MESSAGE,
+                        null,
+                        potionList,
+                        "Pick one!"
+                );
+
+                StringTokenizer token = new StringTokenizer(potion);
+                int potionIndex = Integer.parseInt(token.nextToken());
+
+                storyField.setText("Chose " + character.getInventory().getPotion(potionIndex));
+                character.usePotion(potionIndex);
+                updateStats();
+                JOptionPane.getRootFrame().dispose();
+            }
         }
+
         if(goodMove){
             updateGrid();
             currentCellAction(grid);
-            updateStats();
+            if(grid.getCurrentCell().getType() == Cell.CellType.ENEMY){
+                updateStats();
+            }
         }
         else{
-            if(grid.getCurrentCell().getType() != Cell.CellType.SHOP)
+            if(grid.getCurrentCell().getType() != Cell.CellType.SHOP && grid.getCurrentCell().getType() != Cell.CellType.ENEMY)
                 storyField.setText("Wrong move, try again!");
         }
     }
