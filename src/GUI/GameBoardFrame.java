@@ -19,12 +19,13 @@ public class GameBoardFrame extends JFrame implements ActionListener {
     private final int gridWidth;
     private final int gridHeight;
     private final characters.Character character;
-    private boolean won = false, notDead = true;
     private final Map<Cell.CellType, List<String>> stories;
-    private JLabel charStats, enemyStats, inventoryStatus;
-    private JPanel GUIGrid;
-    private List<JLabel> labelList;
-    private JTextArea storyField, shoppingCart;
+    private final JLabel charStats;
+    private final JLabel enemyStats;
+    private JLabel inventoryStatus;
+    private final JPanel GUIGrid;
+    private final List<JLabel> labelList;
+    private final JTextArea storyField;
     private Grid grid;
     private final JButton up;
     private final JButton down;
@@ -140,16 +141,6 @@ public class GameBoardFrame extends JFrame implements ActionListener {
 
         System.out.println(grid.showAllGrid());
         System.out.println(grid);
-
-//        while(!won && notDead){
-//            System.out.print("Choose direction to move (N, S, E or W): ");
-//            String direction = "TODO direction";
-//            nextMove(direction, grid);
-//        }
-//        grid.getCharacter().incLevel();
-//        grid.getCharacter().updateTraitsWithLevel();
-//
-//        System.out.println("Goodbye!");
     }
 
     private void initLabelList(){
@@ -178,17 +169,13 @@ public class GameBoardFrame extends JFrame implements ActionListener {
                     }
 
                     switch(character){
-                        case 'N' -> {
-                            current.setForeground(Color.gray);
-                        }
+                        case 'N' -> current.setForeground(Color.gray);
                         case 'E' -> {
                             icon = new ImageIcon("/home/magy/IdeaProjects/WorldOfMarcel/res/angry.png");
                             Image image = icon.getImage();
                             Image newImage = image.getScaledInstance(50, 50,  Image.SCALE_DEFAULT);
                             icon = new ImageIcon(newImage);
                             current.setIcon(icon);
-                            //Image newImage = fitimage(image, 200, 200);
-
                         }
                         case 'S' -> {
                             icon = new ImageIcon("/home/magy/IdeaProjects/WorldOfMarcel/res/store.png");
@@ -215,7 +202,7 @@ public class GameBoardFrame extends JFrame implements ActionListener {
                 }
                 current.setHorizontalAlignment(SwingConstants.CENTER);
                 current.setBorder(BorderFactory.createLineBorder(Color.BLACK, 3));
-                labelList.set(i*gridHeight + j, current);
+                labelList.set(i*gridWidth + j, current);
             }
         }
         GUIGrid.removeAll();
@@ -252,7 +239,7 @@ public class GameBoardFrame extends JFrame implements ActionListener {
         storyField.setText(stories.get(element.getType()).get(index));
     }
 
-    public void currentCellAction(Grid grid) {
+    public void currentCellAction(Grid grid) throws InterruptedException {
         System.out.print(grid);
 
         if(grid.getCurrentCell().getObj().toCharacter() == 'N' && !grid.getCurrentCell().visitedMoreThanOnce()){
@@ -260,7 +247,19 @@ public class GameBoardFrame extends JFrame implements ActionListener {
         }
 
         if(grid.getCurrentCell().getObj().toCharacter() == 'F'){
-            won = true;
+            JLabel performance = new JLabel(
+                    character.getEnemiesDefeated() + " enemies defeated, " +
+                    character.getInventory().getCoinNumber() + " coins gained, " +
+                    character.getXp() + " experience, " +
+                    character.getLevel() + " level reached.");
+            dispose();
+
+            JOptionPane.showConfirmDialog(
+                    null,
+                    performance,
+                    "The end.",
+                    JOptionPane.OK_CANCEL_OPTION
+            );
             System.exit(0);
         }
 
@@ -338,13 +337,12 @@ public class GameBoardFrame extends JFrame implements ActionListener {
 
             showStory(grid.getCurrentCell());
             while(enemy.getCurrentLife() > 0 && character.getCurrentLife() > 0){
-                storyField.setText("YOUR TURN! -------------------------------");
                 storyField.setText("""
+                            YOUR TURN! -------------------------------
                             There are 3 options:
                             \t1. attack!
                             \t2. use ability!
                             \t3. use potion!""");
-                System.out.print("Choose your move: ");
 
                 JPanel combatChoices = new JPanel();
                 attack = new JButton("Attack!");
@@ -370,7 +368,7 @@ public class GameBoardFrame extends JFrame implements ActionListener {
 
                 // enemy's turn
                 if(enemy.getCurrentLife() > 0){
-                    storyField.removeAll();
+                    storyField.setText("");
                     int chance = new Random().nextInt(4);
                     if(chance == 0){
                         Spell spell = enemy.getSpell();
@@ -417,7 +415,10 @@ public class GameBoardFrame extends JFrame implements ActionListener {
             }
             else{
                 storyField.setText("You have been defeated. The future is black.");
-                notDead = false;
+                up.setEnabled(false);
+                down.setEnabled(false);
+                left.setEnabled(false);
+                right.setEnabled(false);
             }
         }
     }
@@ -426,6 +427,10 @@ public class GameBoardFrame extends JFrame implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         boolean goodMove = false;
         Character character = grid.getCharacter();
+
+        if(addToCart == null){
+            addToCart = new JButton();
+        }
 
         Object source = e.getSource();
         if (up.equals(source)) {
@@ -436,52 +441,50 @@ public class GameBoardFrame extends JFrame implements ActionListener {
             goodMove = grid.goWest();
         } else if (right.equals(source)) {
             goodMove = grid.goEast();
-        } else if (addToCart != null){
-            if(addToCart.equals(source)){
-                if(potionJList.isSelectionEmpty())
-                    return;
+        } else if(addToCart.equals(source)){
+            if(potionJList.isSelectionEmpty())
+                return;
 
-                DefaultListModel<String> modelShop = (DefaultListModel<String>) potionJList.getModel();
-                DefaultListModel<String> modelInventory = (DefaultListModel<String>) potionInventoryJList.getModel();
+            DefaultListModel<String> modelShop = (DefaultListModel<String>) potionJList.getModel();
+            DefaultListModel<String> modelInventory = (DefaultListModel<String>) potionInventoryJList.getModel();
 
-                String potionToAdd = potionJList.getSelectedValue();
-                int coins = character.getInventory().getCoinNumber();
-                int weight = character.getInventory().getCurrentWeight();
+            String potionToAdd = potionJList.getSelectedValue();
+            int coins = character.getInventory().getCoinNumber();
+            int weight = character.getInventory().getCurrentWeight();
 
-                StringTokenizer tokenizer = new StringTokenizer(potionToAdd);
+            StringTokenizer tokenizer = new StringTokenizer(potionToAdd);
+            tokenizer.nextToken(", ");
+            tokenizer.nextToken(", ");
+            weight += Integer.parseInt(tokenizer.nextToken(", "));
+            tokenizer.nextToken(", ");
+            coins -= Integer.parseInt(tokenizer.nextToken(", "));
+
+            for(int i = 0; i < modelInventory.size(); i++){
+                String potion = modelInventory.get(i);
+                tokenizer = new StringTokenizer(potion);
                 tokenizer.nextToken(", ");
                 tokenizer.nextToken(", ");
                 weight += Integer.parseInt(tokenizer.nextToken(", "));
                 tokenizer.nextToken(", ");
                 coins -= Integer.parseInt(tokenizer.nextToken(", "));
-
-                for(int i = 0; i < modelInventory.size(); i++){
-                    String potion = modelInventory.get(i);
-                    tokenizer = new StringTokenizer(potion);
-                    tokenizer.nextToken(", ");
-                    tokenizer.nextToken(", ");
-                    weight += Integer.parseInt(tokenizer.nextToken(", "));
-                    tokenizer.nextToken(", ");
-                    coins -= Integer.parseInt(tokenizer.nextToken(", "));
-                }
-
-                if(coins >= 0 && weight <= character.getInventory().getMaxWeight()){
-                    shoppingCartIndexList.add(potionJList.getSelectedIndex());
-                    modelInventory.add(modelInventory.size(), potionJList.getSelectedValue());
-                    inventoryStatus.removeAll();
-                    inventoryStatus.setText("Coins: " + coins +
-                            ", max weight: " + character.getInventory().getMaxWeight() +
-                            ", current weight: " + weight);
-                    modelShop.removeElementAt(potionJList.getSelectedIndex());
-                    potionJList.repaint();
-                }
-
-                addToCart.setEnabled(coins > 0 && weight < character.getInventory().getMaxWeight());
             }
+
+            if(coins >= 0 && weight <= character.getInventory().getMaxWeight()){
+                shoppingCartIndexList.add(potionJList.getSelectedIndex());
+                modelInventory.add(modelInventory.size(), potionJList.getSelectedValue());
+                inventoryStatus.removeAll();
+                inventoryStatus.setText("Coins: " + coins +
+                        ", max weight: " + character.getInventory().getMaxWeight() +
+                        ", current weight: " + weight);
+                modelShop.removeElementAt(potionJList.getSelectedIndex());
+                potionJList.repaint();
+            }
+
+            addToCart.setEnabled(coins > 0 && weight < character.getInventory().getMaxWeight());
         } else if(attack.equals(source)){
             Enemy enemy = (Enemy) grid.getCurrentCell().getObj();
             enemy.receiveDamage(character.getDamage());
-            System.out.println("You attacked the enemy!");
+            storyField.setText("You attacked the enemy!");
             updateStats();
             JOptionPane.getRootFrame().dispose();
         } else if(ability.equals(source)){
@@ -496,7 +499,6 @@ public class GameBoardFrame extends JFrame implements ActionListener {
                 JOptionPane.getRootFrame().dispose();
             }
         } else if(potion.equals(source)){
-            Enemy enemy = (Enemy) grid.getCurrentCell().getObj();
             if(character.getInventory().getPotionNumber() == 0){
                 storyField.setText("No potions available!");
             }
@@ -529,7 +531,11 @@ public class GameBoardFrame extends JFrame implements ActionListener {
 
         if(goodMove){
             updateGrid();
-            currentCellAction(grid);
+            try {
+                currentCellAction(grid);
+            } catch (InterruptedException ex) {
+                ex.printStackTrace();
+            }
             if(grid.getCurrentCell().getType() == Cell.CellType.ENEMY){
                 updateStats();
             }

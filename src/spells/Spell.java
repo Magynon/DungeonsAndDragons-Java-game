@@ -1,8 +1,6 @@
 package spells;
 
-import visitor.Visitor;
-
-abstract public class Spell implements Visitor {
+abstract public class Spell {
     protected int damage, mana;
 
     public int getDamage() {

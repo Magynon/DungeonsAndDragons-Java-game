@@ -2,7 +2,6 @@ package characters;
 
 import shop.Inventory;
 import spells.Fire;
-import visitor.Visitor;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -34,7 +33,7 @@ public class Warrior extends Character{
 
     @Override
     public int getDamage() {
-        int damage = (int)(3 * strength / 4 + dexterity / 8 + charisma / 8)/2;
+        int damage = (int) ((int)(3 * strength / 4 + dexterity / 8 + charisma / 8)/1.5);
         if(strength > dexterity + 70*level){
             damage *= 2;
         }
@@ -51,10 +50,5 @@ public class Warrior extends Character{
     @Override
     public String toString() {
         return super.toString();
-    }
-
-    @Override
-    public void accept(Visitor visitor) {
-
     }
 }

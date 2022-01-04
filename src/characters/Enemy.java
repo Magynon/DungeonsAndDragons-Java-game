@@ -4,7 +4,6 @@ import grid.CellElement;
 import spells.Earth;
 import spells.Fire;
 import spells.Ice;
-import visitor.Visitor;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -15,7 +14,7 @@ public class Enemy extends Entity implements CellElement {
     public Enemy(){
         currentLife = new Random().nextInt(16) + 85;
         currentMana = new Random().nextInt(51) + 50;
-        damage = (int) (currentLife*0.15);
+        damage = (int) (currentLife*0.1);
         fire = new Random().nextBoolean();
         earth = !fire && new Random().nextBoolean();
         ice = !fire && !earth && new Random().nextBoolean();
@@ -45,7 +44,7 @@ public class Enemy extends Entity implements CellElement {
             damage /= 2;
         }
         currentLife -= damage;
-        this.damage = (int) (currentLife*0.15);
+        this.damage = (int) (currentLife*0.1);
     }
 
     @Override
@@ -70,10 +69,5 @@ public class Enemy extends Entity implements CellElement {
         return "Enemy{" +
                 "damage=" + damage +
                 "}\n";
-    }
-
-    @Override
-    public void accept(Visitor visitor) {
-        visitor.visit(this);
     }
 }

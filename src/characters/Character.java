@@ -6,18 +6,26 @@ import shop.Potion;
 
 abstract public class Character extends Entity{
     protected String name;
-    protected int xp;
+    protected int xp = 0;
     protected int level = 1;
     protected double strength, charisma, dexterity;
     protected Inventory inventory;
     private int enemiesDefeated = 0;
 
     public void newEnemyDefeated(){
-        enemiesDefeated++;
+        enemiesDefeated++; level += 2; xp += 0.5;
     }
 
     public int getEnemiesDefeated() {
         return enemiesDefeated;
+    }
+
+    public int getXp() {
+        return xp;
+    }
+
+    public int getLevel() {
+        return level;
     }
 
     public Inventory getInventory() {

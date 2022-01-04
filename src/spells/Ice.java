@@ -1,16 +1,9 @@
 package spells;
 
-import characters.Entity;
-
 public class Ice extends Spell{
     public Ice(){
         damage = 10;
         mana = 15;
-    }
-
-    @Override
-    public void visit(Entity entity) {
-
     }
 
     @Override

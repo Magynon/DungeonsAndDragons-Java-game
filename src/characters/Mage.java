@@ -1,10 +1,7 @@
 package characters;
 
 import shop.Inventory;
-import spells.Earth;
-import spells.Fire;
 import spells.Ice;
-import visitor.Visitor;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -41,7 +38,7 @@ public class Mage extends Character{
 
     @Override
     public int getDamage() {
-        int damage = (int)(3 * charisma / 4 + strength / 8 + dexterity / 8)/2;
+        int damage = (int) ((int)(3 * charisma / 4 + strength / 8 + dexterity / 8)/1.5);
         if(charisma > dexterity + 60*level){
             damage *= 2;
         }
@@ -51,10 +48,5 @@ public class Mage extends Character{
     @Override
     public String toString() {
         return super.toString() + "damage: " + getDamage();
-    }
-
-    @Override
-    public void accept(Visitor visitor) {
-
     }
 }
