@@ -13,7 +13,7 @@ abstract public class Character extends Entity{
     private int enemiesDefeated = 0;
 
     public void newEnemyDefeated(){
-        enemiesDefeated++; level += 2; xp += 0.5;
+        enemiesDefeated++; level += 2; xp += 10;
     }
 
     public int getEnemiesDefeated() {
