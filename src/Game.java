@@ -282,8 +282,7 @@ public class Game {
         // choose playing mode
         System.out.println("Choose mode:\n\t1 - Terminal\n\t2 - GUI");
         System.out.print("Enter choice: ");
-        //int mode = keyboard.nextInt();
-        int mode = 2;
+        int mode = keyboard.nextInt();
 
         // parse input
         parser();
@@ -452,7 +451,7 @@ public class Game {
                 boolean actionDone = false;
 
                 while(!actionDone){
-                    System.out.println("lnYOUR TURN! -------------------------------");
+                    System.out.println("YOUR TURN! -------------------------------");
                     System.out.println("STATS:");
                     System.out.print("\tYOU: ");
                     System.out.println("life = " + character.getCurrentLife() + " mana = " + character.getCurrentMana());
